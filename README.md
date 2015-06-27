@@ -6,6 +6,7 @@ This app uses the Sparkle framework which can be found here: http://sparkle-proj
 
 ## Keyboard Controls
 
+              |
 --------------|------------------------
 Choose level  |  1, 2 or 3
 Move snake    |  Arrows or WASD
