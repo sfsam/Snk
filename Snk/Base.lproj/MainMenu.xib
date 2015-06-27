@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8121.20" systemVersion="15A204h" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8121.20"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="Voe-Tx-rLC" id="GzC-gU-4Uq"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Snk" customModuleProvider="target"/>
+        <customObject id="uuj-2n-0bu" customClass="SUUpdater"/>
+        <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
+            <items>
+                <menuItem title="Snk" id="1Xt-HY-uBw">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Snk" systemMenu="apple" id="uQy-DD-JDr">
+                        <items>
+                            <menuItem title="About Snk" id="5kV-Vb-QxS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="orderFrontStandardAboutPanel:" target="-1" id="Exp-CZ-Vem"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
+                            <menuItem title="Check for Updates…" id="BOF-NM-1cW">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="checkForUpdates:" target="uuj-2n-0bu" id="uMY-sD-r2a"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
+                            <menuItem title="Services" id="NMo-om-nkz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
+                            <menuItem title="Hide Snk" keyEquivalent="h" id="Olw-nP-bQN">
+                                <connections>
+                                    <action selector="hide:" target="-1" id="PnN-Uc-m68"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Others" keyEquivalent="h" id="Vdr-fp-XzO">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-1" id="VT4-aY-XCT"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All" id="Kd2-mp-pUS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-1" id="Dhg-Le-xox"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
+                            <menuItem title="Quit Snk" keyEquivalent="q" id="4sb-4s-VLi">
+                                <connections>
+                                    <action selector="terminate:" target="-1" id="Te7-pn-YzF"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Options" id="aUF-d1-5bR">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Options" systemMenu="window" id="Td7-aD-5lo">
+                        <items>
+                            <menuItem title="Sounds" id="OY7-WF-poV">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <binding destination="5dC-R2-4R4" name="value" keyPath="values.EnableSounds" id="dpx-H4-Ecu"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Music" id="DVo-aG-piG">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <binding destination="5dC-R2-4R4" name="value" keyPath="values.EnableMusic" id="8xb-3C-dMn"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="2HO-Zb-epD"/>
+                            <menuItem title="Toggle Size" id="EHM-DP-Acv">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleSize:" target="Voe-Tx-rLC" id="VF3-Gv-WeV"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="whk-pT-JoH"/>
+                            <menuItem title="Clear Scores..." id="Rnw-ZO-pg6">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="clearScores:" target="Voe-Tx-rLC" id="RBf-fF-jL5"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Window" id="R0c-yI-yZ8">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Window" systemMenu="window" id="kH5-vm-gEc">
+                        <items>
+                            <menuItem title="Minimize" keyEquivalent="m" id="kHW-Y8-2I4">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="0aq-lR-iVn"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Close" keyEquivalent="w" id="n8z-fz-S41">
+                                <connections>
+                                    <action selector="performClose:" target="-1" id="Hvd-vA-Y42"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+        </menu>
+        <userDefaultsController representsSharedInstance="YES" id="5dC-R2-4R4"/>
+    </objects>
+</document>
