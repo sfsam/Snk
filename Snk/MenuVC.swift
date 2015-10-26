@@ -39,7 +39,7 @@ final class MenuVC: NSViewController {
         
         snkLogo.centerXWithView(view)
 
-        let metrics = ["a": Int(16 * kScale), "b": kStep]
+        let metrics = ["a": Int(24 * kScale), "b": kStep]
         let makeConstraints = view.constraintMakerWithMetrics(metrics, views: ["snkLogo": snkLogo, "button1": button1, "button2": button2, "button3": button3])
         
         makeConstraints("V:|-a-[snkLogo]-b-[button2]", .AlignAllCenterX)

@@ -39,7 +39,7 @@ let kSong3 = "fotbb.mp3"
 
 // Board dimensions. Includes the wall.
 let kCols = 15,
-    kRows = 13
+    kRows = 14
 
 let kBaseStep = 12
 
