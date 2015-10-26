@@ -21,12 +21,12 @@ final class MainWindow: NSWindow {
     override func becomeMainWindow() {
         super.becomeMainWindow()
         backgroundColor = kBgColor
-        contentView.alphaValue = 1
+        contentView?.alphaValue = 1
     }
     override func resignMainWindow() {
         super.resignMainWindow()
         backgroundColor = kBgColor.blendedColorWithFraction(0.3, ofColor: NSColor.whiteColor())
-        contentView.alphaValue = 0.8
+        contentView?.alphaValue = 0.8
     }
 }
 

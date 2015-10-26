@@ -390,7 +390,7 @@ final class GameVC: NSViewController {
         anim.autoreverses = true
         anim.calculationMode = "discrete"
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
-        anim.values = stride(from: 4, through: kStep, by: 2).map {
+        anim.values = 4.stride(through: kStep, by: 2).map {
             NSValue(size: NSSize(width: $0, height: $0))
         }
         foodLayer.addAnimation(anim, forKey: "pulseFood")
@@ -421,7 +421,7 @@ final class GameVC: NSViewController {
         animExpand.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
         animExpand.calculationMode = "discrete"
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
-        animExpand.values = stride(from: 3 * kStep, through: 6 * kStep, by: 2).map {
+        animExpand.values = (3 * kStep).stride(through: 6 * kStep, by: 2).map {
             NSValue(size: NSSize(width: $0, height: $0))
         }
         
