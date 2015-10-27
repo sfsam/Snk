@@ -19,7 +19,7 @@ func ==(lhs: SnkPoint, rhs: SnkPoint) -> Bool {
 final class GameVC: NSViewController {
     
     enum SnkState {
-        case Initializing, Playing, Crashed, GameOver, Paused
+        case Initializing, Playing, Crashed, Victorious, GameOver, Paused
     }
     
     enum SnkDirection {
@@ -211,7 +211,7 @@ final class GameVC: NSViewController {
         
         // This method is called by the timer.
         
-        if state == .Crashed {
+        if state == .Crashed || state == .Victorious {
             gameOver()
             return
         }
@@ -250,8 +250,15 @@ final class GameVC: NSViewController {
             // choose an empty cell.
             advanceScore()
             snakePoints.append(newHeadPoint)
-            explodeAndPlaceFood()
-            animateBoard()
+            explodeFood()
+            // Did we win? Check if the snake covers the board.
+            if snakePoints.count >= kCols * kRows {
+                state = .Victorious
+            }
+            else {
+                placeFood()
+                animateBoard()
+            }
         }
             
         // The snake didn't get the food.
@@ -278,29 +285,50 @@ final class GameVC: NSViewController {
     // MARK: - Game over
     
     func gameOver() {
+        let reasonForGameOver = state
         SharedAudio.stopMusic()
-        SharedAudio.playSound(kSoundCrash)
         dispatch_source_cancel(timer)
         state = .GameOver
         
-        // We crashed! Rattle the board. The animation is 20
-        // random translations about the view's center.
-        
-        let anim = CAKeyframeAnimation(keyPath: "position")
-        let delta = UInt32(12 * kScale)
-        anim.duration = 0.3
-        anim.calculationMode = "discrete"
-        anim.values = (1...20).map { _ in
-            let x = self.view.layer!.position.x + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
-            let y = self.view.layer!.position.y + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
-            return NSValue(point: CGPoint(x: x, y: y))
+        if reasonForGameOver == .Crashed {
+            // We crashed! Rattle the board. The animation is 20
+            // random translations about the view's center.
+            
+            SharedAudio.playSound(kSoundCrash)
+            
+            let anim = CAKeyframeAnimation(keyPath: "position")
+            let delta = UInt32(12 * kScale)
+            anim.duration = 0.3
+            anim.calculationMode = "discrete"
+            anim.values = (1...20).map { _ in
+                let x = self.view.layer!.position.x + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
+                let y = self.view.layer!.position.y + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
+                return NSValue(point: CGPoint(x: x, y: y))
+            }
+            view.layer!.addAnimation(anim, forKey: "rattle")
         }
-        view.layer!.addAnimation(anim, forKey: "rattle")
+        else { // reasonForGameOver == .Victorious
+            // We won! Remove the food layer and revert the
+            // board to initial 2D orientation.
+            
+            SharedAudio.playSound(kSoundVictory)
+            
+            foodLayer.removeFromSuperlayer()
+            replLayer.removeAllAnimations()
+            
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(0.5)
+            replLayer.transform = CATransform3DIdentity
+            CATransaction.commit()
 
+        }
+        
         // After a brief delay, dim the board and show an
         // ok button centered in the view.
         
-        mo_dispatch_after(0.5) {
+        let okButtonAppearanceDelay: NSTimeInterval = reasonForGameOver == .Crashed ? 0.5 : 1
+        
+        mo_dispatch_after(okButtonAppearanceDelay) {
             SharedAudio.playSound(kSoundGameOver)
             self.replLayer.opacity = 0.5
             let ok = SnkHoverButton(imageName: "ok", tint: kLogoColor, scale: 6)
@@ -398,7 +426,7 @@ final class GameVC: NSViewController {
         placeFood()
     }
     
-    func explodeAndPlaceFood() {
+    func explodeFood() {
         SharedAudio.playSound(kSoundFoodExposion)
         
         // Create an explosion animation when the snake
@@ -444,8 +472,6 @@ final class GameVC: NSViewController {
         explosion.addAnimation(animExpand,  forKey: "expand")
         explosion.addAnimation(animFadeOut, forKey: "fadeout")
         CATransaction.commit()
-        
-        placeFood()
     }
     
     func placeFood() {

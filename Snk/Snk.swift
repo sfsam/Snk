@@ -25,6 +25,7 @@ let kSoundSpinBoard    = "spin.mp3"
 let kSoundCrash        = "explosion.mp3"
 let kSoundGameOver     = "gameover.mp3"
 let kSoundOk           = "woosh.mp3"
+let kSoundVictory      = "tada.mp3"
 
 // MARK: - Music
 

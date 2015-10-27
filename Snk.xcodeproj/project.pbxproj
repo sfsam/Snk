@@ -40,6 +40,7 @@
 		92726CFC1B33DDB600B944FD /* splash.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 92726CF01B33DDB600B944FD /* splash.mp3 */; };
 		92726CFD1B33DDB600B944FD /* tick.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 92726CF11B33DDB600B944FD /* tick.mp3 */; };
 		92726CFE1B33DDB600B944FD /* woosh.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 92726CF21B33DDB600B944FD /* woosh.mp3 */; };
+		928993031BDEE9D4008C0DEA /* tada.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 928993021BDEE9D4008C0DEA /* tada.mp3 */; };
 		9294D1611B38CAC80030C8D9 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9294D1601B38CAC80030C8D9 /* Sparkle.framework */; };
 		9294D1621B38CAD10030C8D9 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9294D1601B38CAC80030C8D9 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92ACF31A1B2CB7AB007494A6 /* SnkImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92ACF3191B2CB7AB007494A6 /* SnkImageView.swift */; };
@@ -97,6 +98,7 @@
 		92726CF01B33DDB600B944FD /* splash.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = splash.mp3; path = _sounds/splash.mp3; sourceTree = "<group>"; };
 		92726CF11B33DDB600B944FD /* tick.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = tick.mp3; path = _sounds/tick.mp3; sourceTree = "<group>"; };
 		92726CF21B33DDB600B944FD /* woosh.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = woosh.mp3; path = _sounds/woosh.mp3; sourceTree = "<group>"; };
+		928993021BDEE9D4008C0DEA /* tada.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = tada.mp3; path = _sounds/tada.mp3; sourceTree = "<group>"; };
 		9294D1601B38CAC80030C8D9 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = _sparkle/Sparkle.framework; sourceTree = "<group>"; };
 		92ACF3191B2CB7AB007494A6 /* SnkImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnkImageView.swift; sourceTree = "<group>"; };
 		92EF54D01B242A3800A32629 /* SplashVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashVC.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 		92726CFF1B33DDBD00B944FD /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				928993021BDEE9D4008C0DEA /* tada.mp3 */,
 				92726CE71B33DDB600B944FD /* 3d.mp3 */,
 				92726CE81B33DDB600B944FD /* bibo.mp3 */,
 				92726CE91B33DDB600B944FD /* boop.mp3 */,
@@ -270,6 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92664C081B2FE2B800784BC4 /* 2.png in Resources */,
+				928993031BDEE9D4008C0DEA /* tada.mp3 in Resources */,
 				92664C0A1B2FE2B800784BC4 /* digitsfg.png in Resources */,
 				92726CF91B33DDB600B944FD /* lance.mp3 in Resources */,
 				92664BE91B2CE93900784BC4 /* mowglii.png in Resources */,
