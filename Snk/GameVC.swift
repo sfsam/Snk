@@ -286,13 +286,13 @@ final class GameVC: NSViewController {
     
     func gameOver() {
         let reasonForGameOver = state
+        state = .GameOver
         SharedAudio.stopMusic()
         dispatch_source_cancel(timer)
-        state = .GameOver
         
         if reasonForGameOver == .Crashed {
-            // We crashed! Rattle the board. The animation is 20
-            // random translations about the view's center.
+            // We crashed! Rattle the board. The animation is 20 random
+            // translations about the view's center.
             
             SharedAudio.playSound(kSoundCrash)
             
@@ -308,28 +308,75 @@ final class GameVC: NSViewController {
             view.layer!.addAnimation(anim, forKey: "rattle")
         }
         else { // reasonForGameOver == .Victorious
-            // We won! Remove the food layer and revert the
-            // board to initial 2D orientation.
+            // We won! Remove the food layer, revert the board to the inital
+            // 2D orientation, and blow up the snake.
             
             SharedAudio.playSound(kSoundVictory)
             
+            // Remove food and stop board from spinning.
             foodLayer.removeFromSuperlayer()
             replLayer.removeAllAnimations()
             
+            // Revert to 2D.
             CATransaction.begin()
             CATransaction.setAnimationDuration(0.5)
+            CATransaction.setCompletionBlock {
+
+                // Cover the snake with segments which we will individually
+                // animate in a celebratory explosion.
+                var segments = [CALayer]()
+                for pt in self.snakePoints.reverse() {
+                    let segment = CALayer()
+                    segment.frame = CGRect(x: pt.x * kStep, y: pt.y * kStep, width: kStep, height: kStep)
+                    segment.backgroundColor = kSnakeColor.CGColor
+                    self.replLayer.addSublayer(segment)
+                    segments.append(segment)
+                }
+                
+                // We've covered the board with segment layers which we
+                // can animate, so now we can remove the snake layer.
+                self.snakeLayer.removeFromSuperlayer()
+
+                // After the board is back to 2D, wait 0.5 seconds and then
+                // "explode" the snake one segment at a time from head to
+                // tail. The animation just moves each segment along a curve.
+                mo_dispatch_after(0.5) {
+                    let boardHeight = CGFloat(kRows * kStep)
+                    for (index, segment) in segments.enumerate() {
+                        mo_dispatch_after(NSTimeInterval(index) * 0.1) {
+                            let animPath = CGPathCreateMutable()
+                            CGPathMoveToPoint(animPath, nil, segment.position.x, segment.position.y)
+                            let midX = NSMidX(self.snakeLayer.frame)
+                            let deltaX = 2 * (segment.position.x - midX)
+                            let deltaY = CGFloat(arc4random_uniform(UInt32(15 * kStep)))
+                            let endPt  = CGPoint(x: segment.position.x + deltaX, y: segment.position.y - boardHeight)
+                            let ctrlPt = CGPoint(x: segment.position.x + deltaX/2, y: segment.position.y + deltaY)
+                            CGPathAddCurveToPoint(animPath, nil, ctrlPt.x, ctrlPt.y, ctrlPt.x, ctrlPt.y, endPt.x, endPt.y)
+                            
+                            let moveAnim = CAKeyframeAnimation(keyPath: "position")
+                            moveAnim.path = animPath
+                            moveAnim.duration = 0.5
+                            moveAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+                            moveAnim.delegate = self
+                            moveAnim.setValue(segment, forKey: "segmentLayer")
+                            segment.addAnimation(moveAnim, forKey: nil)
+                        }
+                    }
+                }
+            }
             replLayer.transform = CATransform3DIdentity
             CATransaction.commit()
-
         }
         
         // After a brief delay, dim the board and show an
         // ok button centered in the view.
         
-        let okButtonAppearanceDelay: NSTimeInterval = reasonForGameOver == .Crashed ? 0.5 : 1
+        let okButtonAppearanceDelay = (reasonForGameOver == .Crashed) ? 0.5 : 4
         
         mo_dispatch_after(okButtonAppearanceDelay) {
-            SharedAudio.playSound(kSoundGameOver)
+            if reasonForGameOver == .Crashed {
+                SharedAudio.playSound(kSoundGameOver)
+            }
             self.replLayer.opacity = 0.5
             let ok = SnkHoverButton(imageName: "ok", tint: kLogoColor, scale: 6)
             ok.dimmedAlpha = 1
@@ -581,6 +628,16 @@ final class GameVC: NSViewController {
             self.updateGame()
         }
         dispatch_resume(timer)
+    }
+    
+    // MARK: - Snake-segment explosion animation did stop
+    
+    override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
+        // Remove the segment layer when its animation is done. See
+        // the .Victorious section of gameOver() for animation code.
+        if let layer = anim.valueForKey("segmentLayer") {
+            layer.removeFromSuperlayer()
+        }
     }
     
     // MARK: - Unused
