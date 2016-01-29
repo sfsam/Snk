@@ -44,7 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // NSFullSizeContentViewWindowMask so that we can draw our own
     // title bar.
     
-    let mainWC = NSWindowController(window: MainWindow(contentRect: NSZeroRect, styleMask: NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSFullSizeContentViewWindowMask, backing: .Buffered, `defer`: false))
+    let mainWC = NSWindowController(window: MainWindow(contentRect: NSZeroRect, styleMask: NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSFullSizeContentViewWindowMask, backing: .Buffered, defer: false))
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         
