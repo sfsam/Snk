@@ -384,7 +384,7 @@ final class GameVC: NSViewController {
             ok.borderHighlightColor = kWallColor
             ok.keyEquivalent = " "
             ok.target = self
-            ok.action = "goToMenu"
+            ok.action = #selector(GameVC.goToMenu)
             self.view.addSubview(ok)
             ok.centerXWithView(self.view)
             ok.centerYWithView(self.view)

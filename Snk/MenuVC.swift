@@ -18,9 +18,9 @@ final class MenuVC: NSViewController {
         
         let snkLogo = SnkImageView(named: "snk", tint: kLogoColor, scale: 7)
 
-        let button1 = SnkLevelButton(level: .Slow,   target: self, action: "playLevel:")
-        let button2 = SnkLevelButton(level: .Medium, target: self, action: "playLevel:")
-        let button3 = SnkLevelButton(level: .Fast,   target: self, action: "playLevel:")
+        let button1 = SnkLevelButton(level: .Slow,   target: self, action: #selector(MenuVC.playLevel(_:)))
+        let button2 = SnkLevelButton(level: .Medium, target: self, action: #selector(MenuVC.playLevel(_:)))
+        let button3 = SnkLevelButton(level: .Fast,   target: self, action: #selector(MenuVC.playLevel(_:)))
         
         // Layout logo and level buttons.
         //
