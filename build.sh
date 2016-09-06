@@ -47,7 +47,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <item>
 <title>Version $VERSION</title>
 <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-<sparkle:releaseNotesLink>http://mowglii.com/snk/changelog.html</sparkle:releaseNotesLink>
+<sparkle:releaseNotesLink>https://mowglii.com/snk/changelog.html</sparkle:releaseNotesLink>
 <pubDate>$DATE +0000</pubDate>
 <enclosure 
 url="https://s3.amazonaws.com/mowglii/$ZIP_NAME"
