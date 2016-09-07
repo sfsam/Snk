@@ -11,34 +11,36 @@ PLIST_FILE="Snk/Info.plist"
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PLIST_FILE)
 
 # Set up file names and paths.
-ZIP_NAME="Snk-$VERSION.zip"
-ZIP_PATH1="$HOME/Desktop/$ZIP_NAME"
-ZIP_PATH2="$HOME/Desktop/Snk.zip"
-XML_PATH="$HOME/Desktop/snk.xml"
+BUILD_PATH=$(mktemp -dt "Snk")
+APP_PATH="$BUILD_PATH/Build/Products/Release/Snk.app"
+SPARKLE_ZIP_NAME="Snk-$VERSION.zip"
+SPARKLE_ZIP_PATH1="$HOME/Desktop/$SPARKLE_ZIP_NAME"
+SPARKLE_ZIP_PATH2="$HOME/Desktop/Snk.zip"
+SPARKLE_XML_PATH="$HOME/Desktop/snk.xml"
 
-# Build an archive and put it in Snk.xcarchive.
-xcodebuild -scheme Snk clean archive -archivePath Snk
-
-# Go into the archive we just made.
-cd Snk.xcarchive/Products/Applications
+# Build Snk in a temporary build location.
+xcodebuild -scheme Snk \
+           -configuration Release \
+           -derivedDataPath "$BUILD_PATH" \
+           build
 
 # Compress the app.
-rm -f "$ZIP_PATH1"
-rm -f "$ZIP_PATH2"
-zip -r -y "$ZIP_PATH1" Snk.app
-cp "$ZIP_PATH1" "$ZIP_PATH2"
+rm -f "$SPARKLE_ZIP_PATH1"
+rm -f "$SPARKLE_ZIP_PATH2"
+zip -r -y "$SPARKLE_ZIP_PATH1" "$APP_PATH"
+cp "$SPARKLE_ZIP_PATH1" "$SPARKLE_ZIP_PATH2"
 
 # Get the date and zip file size for the Sparkle XML.
 DATE=$(TZ=GMT date)
-FILESIZE=$(stat -f "%z" "$ZIP_PATH1")
+FILESIZE=$(stat -f "%z" "$SPARKLE_ZIP_PATH1")
 
 # Make the Sparkle appcast XML file.
-cat > "$XML_PATH" <<EOF
+cat > "$SPARKLE_XML_PATH" <<EOF
 <?xml version="1.0" encoding="utf-8"?>
-<rss 
-version="2.0" 
-xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" 
-xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<rss
+  version="2.0"
+  xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
+  xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Snk Changelog</title>
 <link>http://s3.amazonaws.com/mowglii/snk.xml</link>
@@ -49,11 +51,11 @@ xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
 <sparkle:releaseNotesLink>https://mowglii.com/snk/changelog.html</sparkle:releaseNotesLink>
 <pubDate>$DATE +0000</pubDate>
-<enclosure 
-url="https://s3.amazonaws.com/mowglii/$ZIP_NAME"
-sparkle:version="$VERSION" 
-length="$FILESIZE" 
-type="application/octet-stream" />
+<enclosure
+  url="https://s3.amazonaws.com/mowglii/$SPARKLE_ZIP_NAME"
+  sparkle:version="$VERSION"
+  length="$FILESIZE"
+  type="application/octet-stream" />
 </item>
 </channel>
 </rss>
