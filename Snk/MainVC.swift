@@ -36,14 +36,15 @@ final class MainVC: NSViewController {
         let v = MoView()
         
         // Fill background and draw title bar.
-        v.bgColor = kBgColor
+        
+        v.bgColor = SharedTheme.color(.background)
         v.drawBlock = { (context, bounds) in
             // Title bar gradient.
             var rect = bounds
             rect.origin.y = bounds.height - kTitlebarHeight
             rect.size.height = kTitlebarHeight
-            let c1 = NSColor(white: 1, alpha: 0.9)
-            let c2 = NSColor(white: 1, alpha: 0.5)
+            let c1 = NSColor(white: 1, alpha: 0.8)
+            let c2 = NSColor(white: 1, alpha: 0.4)
             NSGradient(starting: c1, ending: c2)?.draw(in: rect, angle: -90)
             // Title bar top highlight.
             rect.origin.y = bounds.height - 1

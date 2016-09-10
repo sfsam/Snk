@@ -20,7 +20,7 @@ final class SplashVC: NSViewController {
         // Pixel art MOWGLII logo. Draw so each pixel in the
         // source image is 3x3 points (scale = 3) on screen.
         
-        let logoView = SnkImageView(named: "mowglii", tint: kLogoColor, scale: 3)
+        let logoView = SnkImageView(named: "mowglii", tint: SharedTheme.color(.logo), scale: 3)
 
         // Center logo in view. Set alphaValue = 0 so we can 
         // fade in in viewDidAppear().

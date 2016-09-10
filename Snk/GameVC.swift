@@ -37,7 +37,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     let snakeLayer = CALayer()
     let replLayer  = CAReplicatorLayer()
 
-    let scoreLabel = SnkScoreLabel(fgColor: kBgColor, bgColor: kWallColor)
+    let scoreLabel = SnkScoreLabel(fgColor: SharedTheme.color(.background), bgColor: SharedTheme.color(.wall))
     var scoreIncrement = kMaxScoreIncrement
     
     let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
@@ -79,7 +79,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         
         wallLayer.frame = frame
         wallLayer.borderWidth = CGFloat(kStep)
-        wallLayer.borderColor = kWallColor.cgColor
+        wallLayer.borderColor = SharedTheme.color(.wall).cgColor
         
         snakeLayer.frame = frame
         snakeLayer.delegate = self
@@ -87,7 +87,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         snakeLayer.actions = ["contents": NSNull()]
         
         foodLayer.frame = CGRect(x: 0, y: 0, width: kStep, height: kStep)
-        foodLayer.backgroundColor = kFoodColor.cgColor
+        foodLayer.backgroundColor = SharedTheme.color(.food).cgColor
         // Disable implicit animations for changes in position.
         foodLayer.actions = ["position": NSNull()]
         
@@ -326,7 +326,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
                 for pt in self.snakePoints.reversed() {
                     let segment = CALayer()
                     segment.frame = CGRect(x: pt.x * kStep, y: pt.y * kStep, width: kStep, height: kStep)
-                    segment.backgroundColor = kSnakeColor.cgColor
+                    segment.backgroundColor = SharedTheme.color(.snake).cgColor
                     self.replLayer.addSublayer(segment)
                     segments.append(segment)
                 }
@@ -376,10 +376,10 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
                 SharedAudio.play(sound: kSoundGameOver)
             }
             self.replLayer.opacity = 0.5
-            let ok = SnkHoverButton(imageName: "ok", tint: kLogoColor, scale: 6)
+            let ok = SnkHoverButton(imageName: "ok", tint: SharedTheme.color(.logo), scale: 6)
             ok.dimmedAlpha = 1
             ok.borderWidth = 6
-            ok.borderHighlightColor = kWallColor
+            ok.borderHighlightColor = SharedTheme.color(.wall)
             ok.keyEquivalent = " "
             ok.target = self
             ok.action = #selector(GameVC.goToMenu)
@@ -410,7 +410,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     // MARK: - Snake drawing
     
     func draw(_ layer: CALayer, in context: CGContext) {
-        context.setFillColor(kSnakeColor.cgColor)
+        context.setFillColor(SharedTheme.color(.snake).cgColor)
         for p in snakePoints {
             context.fill(CGRect(x: p.x * kStep, y: p.y * kStep, width: kStep, height: kStep))
         }
@@ -480,7 +480,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         
         let explosion = CALayer()
         explosion.frame = foodLayer.frame
-        explosion.borderColor = kExplosionColor.cgColor
+        explosion.borderColor = SharedTheme.color(.explosion).cgColor
         explosion.borderWidth = CGFloat(kStep)
         explosion.opacity = 0
         

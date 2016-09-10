@@ -12,6 +12,7 @@ let kHiScoreFastKey   = "HiScoreFast"
 let kEnableSoundsKey  = "EnableSounds"
 let kEnableMusicKey   = "EnableMusic"
 let kBigBoardKey      = "BigBoard"
+let kThemeNameKey     = "ThemeName"
 
 // MARK: - Sounds
 
@@ -70,14 +71,3 @@ let kLevel3SecPerFrame = 0.045
 let kScoreSpin   = 800
 let kScoreRotate = 720
 let kScore3D     = 450
-
-// MARK: - Colors
-
-let kBgColor = NSColor(red: 0.45, green: 0.73, blue: 1, alpha: 1)
-let kLogoColor = NSColor.white
-let kSnakeColor = NSColor.white
-let kWallColor = NSColor(red: 1, green: 0.95, blue: 0.4, alpha:1)
-let kFoodColor = NSColor.white
-let kExplosionColor = NSColor.white
-let kLevelButtonBorderColor = kWallColor
-let kLevelButtonNumberColor = NSColor.white

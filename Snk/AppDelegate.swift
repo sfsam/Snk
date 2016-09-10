@@ -46,6 +46,8 @@ final class MainWindow: NSWindow {
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
     
+    @IBOutlet var themesMenu: NSMenu?
+    
     let mainWC = NSWindowController(window: MainWindow())
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -58,14 +60,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             kEnableMusicKey:   1 as AnyObject,
             kBigBoardKey:      0 as AnyObject
         ])
+        
+        setupThemesMenu()
 
         showMainWindow()
     }
     
     func showMainWindow() {
         // If we are re-showing the window (because the
-        // user toggle its size), first make sure it is 
-        // not miniturized and not showing.
+        // user toggled its size or changed its theme),
+        // first make sure it is not miniturized and
+        // not showing.
         if mainWC.window?.isMiniaturized == true {
             mainWC.window?.deminiaturize(nil)
         }
@@ -117,6 +122,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         kStep = kBaseStep * Int(kScale)
         
         showMainWindow()
+    }
+
+    func selectTheme(_ sender: NSMenuItem) {
+        let newIndex = sender.tag
+        let oldIndex = SharedTheme.themeIndex
+        guard newIndex != oldIndex else {
+            return
+        }
+        
+        // Uncheck old theme menu item, check new one.
+        themesMenu?.item(at: oldIndex)?.state = 0
+        themesMenu?.item(at: newIndex)?.state = 1
+        
+        // Save the theme name and set the theme manager
+        // to use the new one.
+        let savedName = SharedTheme.themes[newIndex].name.rawValue
+        UserDefaults.standard.set(savedName, forKey: kThemeNameKey)
+        SharedTheme.setTheme(savedName: savedName)
+        
+        showMainWindow()
+    }
+    
+    func setupThemesMenu() {
+        // Set the theme manager to use the saved theme.
+        SharedTheme.setTheme(savedName: UserDefaults.standard.string(forKey: kThemeNameKey))
+        
+        // Create menu items for the themes in the theme
+        // manager's 'themes' array.
+        for (index, theme) in SharedTheme.themes.enumerated() {
+            let item = NSMenuItem()
+            item.title = theme.name.rawValue
+            item.state = index == SharedTheme.themeIndex ? 1 : 0
+            item.tag = index
+            item.action = #selector(selectTheme(_:))
+            themesMenu?.addItem(item)
+        }
     }
 }
 

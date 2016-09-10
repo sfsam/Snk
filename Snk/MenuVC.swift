@@ -16,7 +16,7 @@ final class MenuVC: NSViewController {
         // SNK logo. Draw so each pixel in the source image
         // is 7x7 points (scale = 7) on screen.
         
-        let logo = SnkImageView(named: "snk", tint: kLogoColor, scale: 7)
+        let logo = SnkImageView(named: "snk", tint: SharedTheme.color(.logo), scale: 7)
 
         let button1 = SnkLevelButton(level: .slow,   target: self, action: #selector(MenuVC.activate(button:)))
         let button2 = SnkLevelButton(level: .medium, target: self, action: #selector(MenuVC.activate(button:)))

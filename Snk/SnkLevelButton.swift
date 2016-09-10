@@ -14,7 +14,7 @@ let kScoreDimmedAlpha: CGFloat = 0.2
 
 final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
     
-    let scoreLabel = SnkScoreLabel(fgColor: kLogoColor)
+    let scoreLabel = SnkScoreLabel(fgColor: SharedTheme.color(.logo))
     
     init(level: SnkLevel, target: AnyObject?, action: Selector) {
         super.init(frame: NSZeroRect)
@@ -43,12 +43,12 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         // Button dimensions. Button shows a border.
         
         button.makeConstraints(width: 48 * kScale, height: 48 * kScale)
-        button.borderHighlightColor = kLevelButtonBorderColor
+        button.borderHighlightColor = SharedTheme.color(.buttonBorder)
         button.dimmedAlpha = 1
         
         // Set up the view that shows the level number.
         
-        let numberView = SnkImageView(named: String(level.rawValue), tint: kLevelButtonNumberColor, scale: 5)
+        let numberView = SnkImageView(named: String(level.rawValue), tint: SharedTheme.color(.buttonNumber), scale: 5)
         button.addSubview(numberView)
         numberView.alphaValue = 0.3
         numberView.centerX(with: button)
@@ -83,7 +83,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         
         snakeLayer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
         snakeLayer.magnificationFilter = kCAFilterNearest
-        snakeLayer.contents = NSImage(named: "frames")?.tint(color: kSnakeColor)
+        snakeLayer.contents = NSImage(named: "frames")?.tint(color: SharedTheme.color(.snake))
         snakeLayer.add(snakeAnim, forKey: "snakeAnim")
         
         // Create a view to host the snake layer and center it
