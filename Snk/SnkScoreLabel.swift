@@ -53,25 +53,24 @@ final class SnkScoreLabel: MoView {
     // Create a score label with a digit background.
 
     init(fgColor: NSColor, bgColor: NSColor) {
-        
-        self.digitsFg = NSImage(named: "digitsfg")?.tint(fgColor)
-        self.digitsBg = NSImage(named: "digitsbg")?.tint(bgColor)
+        self.digitsFg = NSImage(named: "digitsfg")?.tint(color: fgColor)
+        self.digitsBg = NSImage(named: "digitsbg")?.tint(color: bgColor)
         
         super.init(frame: NSZeroRect)
         
-        self.drawBlock = { (ctx, bounds) in
+        self.drawBlock = { (context, bounds) in
             
             if self.score == 0 { return }
             
             // No anti-aliasing so pixels are sharp when scaled.
-            CGContextSetInterpolationQuality(ctx, .None)
+            context.interpolationQuality = .none
 
             // Convert the score to a string so we can enumerate its
             // digits. First draw the digit background and then draw 
             // the digit foreground on top of it.
             
             let scoreString = String(self.score)
-            for (index, digitCharacter) in scoreString.characters.enumerate() {
+            for (index, digitCharacter) in scoreString.characters.enumerated() {
                 let digit  = Int( String(digitCharacter) )!
                 let toOffset   = 12 * kScale * CGFloat(index)
                 let toWidth    = 14 * kScale
@@ -79,9 +78,9 @@ final class SnkScoreLabel: MoView {
                 let toRect   = NSRect(x: toOffset, y: 0, width: toWidth, height: toWidth)
                 let fromRect = NSRect(x: fromOffset, y: 0, width: 7, height: 7)
                 if self.drawsDigitsBackground {
-                   self.digitsBg.drawInRect(toRect, fromRect: fromRect, operation: .CompositeSourceOver, fraction: 1)
+                    self.digitsBg.draw(in: toRect, from: fromRect, operation: .sourceOver, fraction: 1)
                 }
-                self.digitsFg.drawInRect(toRect, fromRect: fromRect, operation: .CompositeSourceOver, fraction: 1)
+                self.digitsFg.draw(in: toRect, from: fromRect, operation: .sourceOver, fraction: 1)
             }
         }
     }

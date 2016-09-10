@@ -27,9 +27,9 @@ class SnkImageView: MoView {
         let width  = scale * image.size.width * kScale
         let height = scale * image.size.height * kScale
         super.init(frame: NSRect(x: 0, y: 0, width: width, height: height))
-        self.makeWidth(width, height: height)
-        self.drawBlock = { (ctx, bounds) in
-            image.drawInRect(bounds)
+        self.makeConstraints(width: width, height: height)
+        self.drawBlock = { (context, bounds) in
+            image.draw(in: bounds)
         }
     }
     
@@ -39,7 +39,7 @@ class SnkImageView: MoView {
     
     convenience init(named name: String, tint: NSColor?, scale: CGFloat = 1) {
         let image = (tint == nil) ? NSImage(named: name)
-                                  : NSImage(named: name)?.tint(tint!)
+                                  : NSImage(named: name)?.tint(color: tint!)
         self.init(image: image, scale: scale)
     }
 

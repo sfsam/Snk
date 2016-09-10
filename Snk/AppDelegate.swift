@@ -8,24 +8,35 @@ import Cocoa
 
 final class MainWindow: NSWindow {
     
+    // The main window is non-resizable and non-zoomable.
+    // Its fixed size is determined by the MainVC's view.
+    // The window uses the NSFullSizeContentViewWindowMask
+    // so that we can draw our own custom title bar.
+
+    convenience init() {
+        self.init(contentRect: NSZeroRect, styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)
+        self.titlebarAppearsTransparent = true
+        self.standardWindowButton(.zoomButton)?.alphaValue = 0
+    }
+    
     // The app terminates when the main window is closed.
 
     override func close() {
-        NSApplication.sharedApplication().terminate(nil)
+        NSApplication.shared().terminate(nil)
     }
     
     // The window's background color depends on Main status.
     // Also, when the window isn't Main, the content view is
     // slightly faded.
 
-    override func becomeMainWindow() {
-        super.becomeMainWindow()
+    override func becomeMain() {
+        super.becomeMain()
         backgroundColor = kBgColor
         contentView?.alphaValue = 1
     }
-    override func resignMainWindow() {
-        super.resignMainWindow()
-        backgroundColor = kBgColor.blendedColorWithFraction(0.3, ofColor: NSColor.whiteColor())
+    override func resignMain() {
+        super.resignMain()
+        backgroundColor = kBgColor.blended(withFraction: 0.3, of: NSColor.white)
         contentView?.alphaValue = 0.8
     }
 }
@@ -39,54 +50,39 @@ final class MainWindow: NSWindow {
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
     
-    // The main window is non-resizable and non-zoomable. Its fixed
-    // size is determined by the MainVC's view. The window uses the
-    // NSFullSizeContentViewWindowMask so that we can draw our own
-    // title bar.
-    
-    let mainWC = NSWindowController(window: MainWindow(contentRect: NSZeroRect, styleMask: NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSFullSizeContentViewWindowMask, backing: .Buffered, defer: false))
+    let mainWC = NSWindowController(window: MainWindow())
 
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
         
-        // Register defaults.
-        
-        let defaultOptions: [String: AnyObject] = [
-            kHiScoreSlowKey:   0,
-            kHiScoreMediumKey: 0,
-            kHiScoreFastKey:   0,
-            kEnableSoundsKey:  1,
-            kEnableMusicKey:   1,
-            kBigBoardKey:      0
-        ]
-        NSUserDefaults.standardUserDefaults().registerDefaults(defaultOptions)
+        UserDefaults.standard.register(defaults: [
+            kHiScoreSlowKey:   0 as AnyObject,
+            kHiScoreMediumKey: 0 as AnyObject,
+            kHiScoreFastKey:   0 as AnyObject,
+            kEnableSoundsKey:  1 as AnyObject,
+            kEnableMusicKey:   1 as AnyObject,
+            kBigBoardKey:      0 as AnyObject
+        ])
 
         showMainWindow()
     }
     
     func showMainWindow() {
-        
         mainWC.contentViewController = MainVC()
         
         // Set the window background color.
-        // Hide the titlebar so we can draw our own in MainVC.
-        // Hide the unused zoom button.
         
         mainWC.window?.backgroundColor = kBgColor
-        mainWC.window?.titlebarAppearsTransparent = true
-        mainWC.window?.standardWindowButton(.ZoomButton)?.alphaValue = 0
         
         // Fade the window in.
-        
         mainWC.window?.alphaValue = 0
         mainWC.showWindow(self)
         mainWC.window?.center()
-        mo_dispatch_after(0.1) {
+        moDispatch(after: 0.1) {
             self.mainWC.window?.animator().alphaValue = 1
         }
     }
 
-    @IBAction func clearScores(sender: AnyObject) {
-        
+    @IBAction func clearScores(_ sender: AnyObject) {
         // Called from the Clear Scores... menu item.
         // Show an alert to confirm the user really
         // wants to erase their saved high scores.
@@ -94,18 +90,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Clear scores?", comment: "")
         alert.informativeText = NSLocalizedString("Do you really want to clear your best scores?", comment: "")
-        alert.addButtonWithTitle(NSLocalizedString("No", comment: ""))
-        alert.addButtonWithTitle(NSLocalizedString("Yes", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("No", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Yes", comment: ""))
         if alert.runModal() == NSAlertSecondButtonReturn {
-            let defaults = NSUserDefaults.standardUserDefaults()
-            defaults.setInteger(0, forKey: kHiScoreSlowKey)
-            defaults.setInteger(0, forKey: kHiScoreMediumKey)
-            defaults.setInteger(0, forKey: kHiScoreFastKey)
+            UserDefaults.standard.set(0, forKey: kHiScoreSlowKey)
+            UserDefaults.standard.set(0, forKey: kHiScoreMediumKey)
+            UserDefaults.standard.set(0, forKey: kHiScoreFastKey)
         }
     }
     
-    @IBAction func toggleSize(sender: AnyObject) {
-
+    @IBAction func toggleSize(_ sender: AnyObject) {
         // Called from Toggle Size menu item.
         // Toggle between standard and big board size.
         // Set the user default to the new value, set
@@ -117,12 +111,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         SharedAudio.stopEverything()
         
         let bigBoard = kScale == 1 ? true : false
-        NSUserDefaults.standardUserDefaults().setBool(bigBoard, forKey: kBigBoardKey)
+        UserDefaults.standard.set(bigBoard, forKey: kBigBoardKey)
         
         kScale = bigBoard ? 2 : 1
         kStep = kBaseStep * Int(kScale)
         
-        if mainWC.window?.miniaturized == true {
+        if mainWC.window?.isMiniaturized == true {
             mainWC.window?.deminiaturize(nil)
         }
         

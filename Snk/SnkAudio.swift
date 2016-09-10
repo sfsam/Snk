@@ -41,33 +41,32 @@ final class SnkAudio: NSObject {
         // properties to the corresponding defaults
         // which the user can change at any time.
         
-        self.bind("soundsEnabled", toObject: NSUserDefaultsController.sharedUserDefaultsController(), withKeyPath: "values." + kEnableSoundsKey, options: nil)
-        self.bind("musicEnabled", toObject: NSUserDefaultsController.sharedUserDefaultsController(), withKeyPath: "values." + kEnableMusicKey, options: nil)
+        self.bind("soundsEnabled", to: NSUserDefaultsController.shared(), withKeyPath: "values." + kEnableSoundsKey, options: nil)
+        self.bind("musicEnabled", to: NSUserDefaultsController.shared(), withKeyPath: "values." + kEnableMusicKey, options: nil)
     }
     
     func loadSounds() {
-        
         // Populate the sounds dictionary with loaded 
         // sounds so we can play them instantly later.
         
-        for filePath in [kSoundStartup, kSoundHover, kSoundStartGame, kSoundFoodExposion, kSoundAnimateTo3D, kSoundRotateBoard, kSoundSpinBoard, kSoundCrash, kSoundGameOver, kSoundOk, kSoundVictory] {
+        for filePath in [kSoundStartup, kSoundHover, kSoundStartGame, kSoundFoodExplosion, kSoundAnimateTo3D, kSoundRotateBoard, kSoundSpinBoard, kSoundCrash, kSoundGameOver, kSoundOk, kSoundVictory] {
             sounds[filePath] = NSSound(named: filePath)!
         }
     }
     
     // Play or stop playing sounds and music...
     
-    func playSound(filePath: String, volume: Float = 1) {
+    func play(sound filePath: String, volume: Float = 1) {
         sound = sounds[filePath]
         guard let sound = sound else { return }
         sound.volume = soundsEnabled ? volume : 0
-        if sound.playing {
+        if sound.isPlaying {
             sound.stop()
         }
         sound.play()
     }
     
-    func playMusic(filePath: String, volume: Float = 1, loop: Bool = false) {
+    func play(music filePath: String, volume: Float = 1, loop: Bool = false) {
         stopMusic()
         music = NSSound(named: filePath)
         guard let music = music else { return }

@@ -246,6 +246,9 @@
 				TargetAttributes = {
 					92175E881B14F3BD007151EA = {
 						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = HFT3T55WND;
+						LastSwiftMigration = 0800;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -424,12 +427,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HFT3T55WND;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Snk/_sparkle";
 				INFOPLIST_FILE = Snk/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mowglii.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Snk;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -439,12 +444,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HFT3T55WND;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Snk/_sparkle";
 				INFOPLIST_FILE = Snk/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mowglii.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Snk;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

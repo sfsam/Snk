@@ -16,14 +16,14 @@ func ==(lhs: SnkPoint, rhs: SnkPoint) -> Bool {
     return lhs.x == rhs.x && lhs.y == rhs.y
 }
 
-final class GameVC: NSViewController {
+final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     
     enum SnkState {
-        case Initializing, Playing, Crashed, Victorious, GameOver, Paused
+        case initializing, playing, crashed, victorious, gameOver, paused
     }
     
     enum SnkDirection {
-        case Up, Down, Left, Right
+        case up, down, left, right
     }
     
     let level: SnkLevel
@@ -40,7 +40,7 @@ final class GameVC: NSViewController {
     let scoreLabel = SnkScoreLabel(fgColor: kBgColor, bgColor: kWallColor)
     var scoreIncrement = kMaxScoreIncrement
     
-    let timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())
+    let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
 
     // The snake is represented by a list of points with
     // the head at the end of the list (snakePoints.last).
@@ -48,7 +48,7 @@ final class GameVC: NSViewController {
     var snakePoints = [SnkPoint]()
     var foodPoint = SnkPoint()
     
-    var direction: SnkDirection = .Right
+    var direction: SnkDirection = .right
     var directionBuffer = [SnkDirection]()
 
     // When the score is over kScoreSpin, the board
@@ -56,10 +56,10 @@ final class GameVC: NSViewController {
     
     var wallsEnabled = true
     
-    var state: SnkState = .Initializing {
+    var state: SnkState = .initializing {
         didSet {
             // Hide the cursor when state == .Playing
-            NSCursor.setHiddenUntilMouseMoves(state == .Playing)
+            NSCursor.setHiddenUntilMouseMoves(state == .playing)
         }
     }
     
@@ -79,7 +79,7 @@ final class GameVC: NSViewController {
         
         wallLayer.frame = frame
         wallLayer.borderWidth = CGFloat(kStep)
-        wallLayer.borderColor = kWallColor.CGColor
+        wallLayer.borderColor = kWallColor.cgColor
         
         snakeLayer.frame = frame
         snakeLayer.delegate = self
@@ -87,7 +87,7 @@ final class GameVC: NSViewController {
         snakeLayer.actions = ["contents": NSNull()]
         
         foodLayer.frame = CGRect(x: 0, y: 0, width: kStep, height: kStep)
-        foodLayer.backgroundColor = kFoodColor.CGColor
+        foodLayer.backgroundColor = kFoodColor.cgColor
         // Disable implicit animations for changes in position.
         foodLayer.actions = ["position": NSNull()]
         
@@ -121,8 +121,8 @@ final class GameVC: NSViewController {
         // so that it appears inside the wall.
         
         v.addSubview(scoreLabel)
-        scoreLabel.alignTrailingWithView(v, constant: CGFloat(kStep) + 10 * kScale)
-        scoreLabel.alignBottomToTopOfView(v, constant: CGFloat(-kStep) - 12 * kScale)
+        scoreLabel.alignTrailing(with: v, constant: CGFloat(kStep) + 10 * kScale)
+        scoreLabel.alignBottomToTop(of: v, constant: CGFloat(-kStep) - 12 * kScale)
         
         view = v
     }
@@ -150,43 +150,42 @@ final class GameVC: NSViewController {
         view.window!.makeFirstResponder(self)
         
         switch level {
-        case .Slow:   SharedAudio.playMusic(kSong1, loop: true)
-        case .Medium: SharedAudio.playMusic(kSong2, loop: true)
-        case .Fast:   SharedAudio.playMusic(kSong3, loop: true)
+        case .slow:   SharedAudio.play(music: kSong1, loop: true)
+        case .medium: SharedAudio.play(music: kSong2, loop: true)
+        case .fast:   SharedAudio.play(music: kSong3, loop: true)
         }
         
-        state = .Playing
+        state = .playing
     }
     
     // MARK: - Input
     
-    override func keyDown(theEvent: NSEvent) {
-        func key(x: Int) -> String {
-            return String(UnicodeScalar(x))
+    override func keyDown(with theEvent: NSEvent) {
+        func key(_ x: Int) -> String {
+            return UnicodeScalar(x)!.escaped(asASCII: false)
         }
         if let chars = theEvent.charactersIgnoringModifiers {
             switch chars {
-            case "w", "W", key(NSUpArrowFunctionKey):    addDirection(.Up)
-            case "s", "S", key(NSDownArrowFunctionKey):  addDirection(.Down)
-            case "a", "A", key(NSLeftArrowFunctionKey):  addDirection(.Left)
-            case "d", "D", key(NSRightArrowFunctionKey): addDirection(.Right)
+            case "w", "W", key(NSUpArrowFunctionKey):    addDirection(.up)
+            case "s", "S", key(NSDownArrowFunctionKey):  addDirection(.down)
+            case "a", "A", key(NSLeftArrowFunctionKey):  addDirection(.left)
+            case "d", "D", key(NSRightArrowFunctionKey): addDirection(.right)
             case "P":
-                if state == .Playing || state == .Paused {
-                    state = state == .Playing ? .Paused : .Playing
+                if state == .playing || state == .paused {
+                    state = state == .playing ? .paused : .playing
                 }
-            case "1": playLevel(.Slow)
-            case "2": playLevel(.Medium)
-            case "3": playLevel(.Fast)
-            default: super.keyDown(theEvent)
+            case "1": play(level: .slow)
+            case "2": play(level: .medium)
+            case "3": play(level: .fast)
+            default: super.keyDown(with: theEvent)
             }
         }
         else {
-            super.keyDown(theEvent)
+            super.keyDown(with: theEvent)
         }
     }
     
-    func addDirection(newDir: SnkDirection) {
-        
+    func addDirection(_ newDir: SnkDirection) {
         // Buffer directional keypresses in directionBuffer. 
         // Only do so when state == .Playing.
         // Consecutive directions can't be the same or
@@ -194,12 +193,12 @@ final class GameVC: NSViewController {
         // or .Right next, not .Down).
         
         let oldDir = directionBuffer.count > 0 ? directionBuffer.last : direction
-        if  state  != .Playing ||
+        if  state  != .playing ||
             newDir == oldDir ||
-            newDir == .Up    && oldDir == .Down ||
-            newDir == .Down  && oldDir == .Up   ||
-            newDir == .Right && oldDir == .Left ||
-            newDir == .Left  && oldDir == .Right {
+            newDir == .up    && oldDir == .down ||
+            newDir == .down  && oldDir == .up   ||
+            newDir == .right && oldDir == .left ||
+            newDir == .left  && oldDir == .right {
             return
         }
         directionBuffer.append(newDir)
@@ -208,19 +207,18 @@ final class GameVC: NSViewController {
     // MARK: - Update
     
     func updateGame() {
-        
         // This method is called by the timer.
         
-        if state == .Crashed || state == .Victorious {
+        if state == .crashed || state == .victorious {
             gameOver()
             return
         }
-        if state != .Playing {
+        if state != .playing {
             return
         }
         
         if directionBuffer.count > 0 {
-            direction = directionBuffer.removeAtIndex(0)
+            direction = directionBuffer.remove(at: 0)
         }
         
         // Calculate where the snake's head will
@@ -229,10 +227,10 @@ final class GameVC: NSViewController {
         
         var newHeadPoint = snakePoints.last!
         switch direction {
-        case .Up:    newHeadPoint.y += 1
-        case .Down:  newHeadPoint.y -= 1
-        case .Left:  newHeadPoint.x -= 1
-        case .Right: newHeadPoint.x += 1
+        case .up:    newHeadPoint.y += 1
+        case .down:  newHeadPoint.y -= 1
+        case .left:  newHeadPoint.x -= 1
+        case .right: newHeadPoint.x += 1
         }
         if wallsEnabled == false {
             newHeadPoint.y = newHeadPoint.y > kRows-1 ? 0 : newHeadPoint.y
@@ -253,7 +251,7 @@ final class GameVC: NSViewController {
             explodeFood()
             // Did we win? Check if the snake covers the board.
             if snakePoints.count >= kCols * kRows {
-                state = .Victorious
+                state = .victorious
             }
             else {
                 placeFood()
@@ -269,12 +267,12 @@ final class GameVC: NSViewController {
             // Otherwise we'd wrongly collide with a
             // phantom tail or the new head.
             tickScore()
-            snakePoints.removeAtIndex(0)
+            snakePoints.remove(at: 0)
             if (wallsEnabled &&
                 (newHeadPoint.x <= 0 || newHeadPoint.x >= kCols-1 ||
                  newHeadPoint.y <= 0 || newHeadPoint.y >= kRows-1)) ||
                 snakePoints.contains(newHeadPoint) {
-                state = .Crashed
+                state = .crashed
             }
             snakePoints.append(newHeadPoint)
         }
@@ -286,15 +284,15 @@ final class GameVC: NSViewController {
     
     func gameOver() {
         let reasonForGameOver = state
-        state = .GameOver
+        state = .gameOver
         SharedAudio.stopMusic()
-        dispatch_source_cancel(timer)
+        timer.cancel()
         
-        if reasonForGameOver == .Crashed {
+        if reasonForGameOver == .crashed {
             // We crashed! Rattle the board. The animation is 20 random
             // translations about the view's center.
             
-            SharedAudio.playSound(kSoundCrash)
+            SharedAudio.play(sound: kSoundCrash)
             
             let anim = CAKeyframeAnimation(keyPath: "position")
             let delta = UInt32(12 * kScale)
@@ -305,13 +303,13 @@ final class GameVC: NSViewController {
                 let y = self.view.layer!.position.y + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
                 return NSValue(point: CGPoint(x: x, y: y))
             }
-            view.layer!.addAnimation(anim, forKey: "rattle")
+            view.layer!.add(anim, forKey: "rattle")
         }
-        else { // reasonForGameOver == .Victorious
+        else { // reasonForGameOver == .victorious
             // We won! Remove the food layer, revert the board to the inital
             // 2D orientation, and blow up the snake.
             
-            SharedAudio.playSound(kSoundVictory)
+            SharedAudio.play(sound: kSoundVictory)
             
             // Remove food and stop board from spinning.
             foodLayer.removeFromSuperlayer()
@@ -325,10 +323,10 @@ final class GameVC: NSViewController {
                 // Cover the snake with segments which we will individually
                 // animate in a celebratory explosion.
                 var segments = [CALayer]()
-                for pt in self.snakePoints.reverse() {
+                for pt in self.snakePoints.reversed() {
                     let segment = CALayer()
                     segment.frame = CGRect(x: pt.x * kStep, y: pt.y * kStep, width: kStep, height: kStep)
-                    segment.backgroundColor = kSnakeColor.CGColor
+                    segment.backgroundColor = kSnakeColor.cgColor
                     self.replLayer.addSublayer(segment)
                     segments.append(segment)
                 }
@@ -340,18 +338,18 @@ final class GameVC: NSViewController {
                 // After the board is back to 2D, wait 0.5 seconds and then
                 // "explode" the snake one segment at a time from head to
                 // tail. The animation just moves each segment along a curve.
-                mo_dispatch_after(0.5) {
+                moDispatch(after: 0.5) {
                     let boardHeight = CGFloat(kRows * kStep)
-                    for (index, segment) in segments.enumerate() {
-                        mo_dispatch_after(NSTimeInterval(index) * 0.1) {
-                            let animPath = CGPathCreateMutable()
-                            CGPathMoveToPoint(animPath, nil, segment.position.x, segment.position.y)
+                    for (index, segment) in segments.enumerated() {
+                        moDispatch(after: TimeInterval(index) * 0.1) {
+                            let animPath = CGMutablePath()
+                            animPath.move(to: segment.position)
                             let midX = NSMidX(self.snakeLayer.frame)
                             let deltaX = 2 * (segment.position.x - midX)
                             let deltaY = CGFloat(arc4random_uniform(UInt32(15 * kStep)))
                             let endPt  = CGPoint(x: segment.position.x + deltaX, y: segment.position.y - boardHeight)
                             let ctrlPt = CGPoint(x: segment.position.x + deltaX/2, y: segment.position.y + deltaY)
-                            CGPathAddCurveToPoint(animPath, nil, ctrlPt.x, ctrlPt.y, ctrlPt.x, ctrlPt.y, endPt.x, endPt.y)
+                            animPath.addCurve(to: endPt, control1: ctrlPt, control2: ctrlPt)
                             
                             let moveAnim = CAKeyframeAnimation(keyPath: "position")
                             moveAnim.path = animPath
@@ -359,7 +357,7 @@ final class GameVC: NSViewController {
                             moveAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
                             moveAnim.delegate = self
                             moveAnim.setValue(segment, forKey: "segmentLayer")
-                            segment.addAnimation(moveAnim, forKey: nil)
+                            segment.add(moveAnim, forKey: nil)
                         }
                     }
                 }
@@ -371,11 +369,11 @@ final class GameVC: NSViewController {
         // After a brief delay, dim the board and show an
         // ok button centered in the view.
         
-        let okButtonAppearanceDelay = (reasonForGameOver == .Crashed) ? 0.5 : 4
+        let okButtonAppearanceDelay = (reasonForGameOver == .crashed) ? 0.5 : 4
         
-        mo_dispatch_after(okButtonAppearanceDelay) {
-            if reasonForGameOver == .Crashed {
-                SharedAudio.playSound(kSoundGameOver)
+        moDispatch(after: okButtonAppearanceDelay) {
+            if reasonForGameOver == .crashed {
+                SharedAudio.play(sound: kSoundGameOver)
             }
             self.replLayer.opacity = 0.5
             let ok = SnkHoverButton(imageName: "ok", tint: kLogoColor, scale: 6)
@@ -386,43 +384,41 @@ final class GameVC: NSViewController {
             ok.target = self
             ok.action = #selector(GameVC.goToMenu)
             self.view.addSubview(ok)
-            ok.centerXWithView(self.view)
-            ok.centerYWithView(self.view)
+            ok.centerX(with: self.view)
+            ok.centerY(with: self.view)
         }
     }
     
     func goToMenu() {
-        
         // User pressed the OK button after a game.
         // Go back to the main menu.
         
         SharedAudio.stopEverything()
-        SharedAudio.playSound(kSoundOk)
-        let mainVC = self.parentViewController as! MainVC
-        mainVC.transitionToViewController(MenuVC(), options: .SlideRight)
+        SharedAudio.play(sound: kSoundOk)
+        let mainVC = self.parent as! MainVC
+        mainVC.transition(to: MenuVC(), options: .slideRight)
     }
     
-    func playLevel(level: SnkLevel) {
-        guard state == .GameOver else { return }
+    private func play(level: SnkLevel) {
+        guard state == .gameOver else { return }
         SharedAudio.stopEverything()
-        let mainVC = self.parentViewController as! MainVC
-        mainVC.transitionToViewController(GameVC(level: level), options: .SlideLeft)
-        SharedAudio.playSound(kSoundStartGame)
+        let mainVC = self.parent as! MainVC
+        mainVC.transition(to: GameVC(level: level), options: .slideLeft)
+        SharedAudio.play(sound: kSoundStartGame)
     }
     
     // MARK: - Snake drawing
     
-    override func drawLayer(layer: CALayer, inContext ctx: CGContext) {
-        CGContextSetFillColorWithColor(ctx, kSnakeColor.CGColor)
+    func draw(_ layer: CALayer, in context: CGContext) {
+        context.setFillColor(kSnakeColor.cgColor)
         for p in snakePoints {
-            CGContextFillRect(ctx, CGRect(x: p.x * kStep, y: p.y * kStep, width: kStep, height: kStep))
+            context.fill(CGRect(x: p.x * kStep, y: p.y * kStep, width: kStep, height: kStep))
         }
     }
 
     // MARK: - Score
     
     func advanceScore() {
-        
         // Advance score by scoreIncrement and reset
         // scoreIncrement to its max value. Save the
         // score if it's a high score for this level.
@@ -430,20 +426,19 @@ final class GameVC: NSViewController {
         scoreLabel.score += scoreIncrement
         scoreIncrement = kMaxScoreIncrement
 
-        let defaults = NSUserDefaults.standardUserDefaults()
+        let defaults = UserDefaults.standard
         let key: String
         switch level {
-        case .Slow:   key = kHiScoreSlowKey
-        case .Medium: key = kHiScoreMediumKey
-        case .Fast:   key = kHiScoreFastKey
+        case .slow:   key = kHiScoreSlowKey
+        case .medium: key = kHiScoreMediumKey
+        case .fast:   key = kHiScoreFastKey
         }
-        if scoreLabel.score > defaults.integerForKey(key) {
-            defaults.setInteger(scoreLabel.score, forKey: key)
+        if scoreLabel.score > defaults.integer(forKey: key) {
+            defaults.set(scoreLabel.score, forKey: key)
         }
     }
     
     func tickScore() {
-        
         // On each timer tick, we decrement the amount by which
         // we'll increment the score when the snake gets the food.
         // The smallest possible scoreIncrement is 1.
@@ -454,7 +449,6 @@ final class GameVC: NSViewController {
     // MARK: - Food
     
     func setupFood() {
-        
         // Set up a perpetual animation on the food
         // which pulses its bounds and then place
         // the food randomly on the board.
@@ -465,16 +459,16 @@ final class GameVC: NSViewController {
         anim.autoreverses = true
         anim.calculationMode = "discrete"
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
-        anim.values = 4.stride(through: kStep, by: 2).map {
+        anim.values = stride(from: 4, through: kStep, by: 2).map {
             NSValue(size: NSSize(width: $0, height: $0))
         }
-        foodLayer.addAnimation(anim, forKey: "pulseFood")
+        foodLayer.add(anim, forKey: "pulseFood")
         
         placeFood()
     }
     
     func explodeFood() {
-        SharedAudio.playSound(kSoundFoodExposion)
+        SharedAudio.play(sound: kSoundFoodExplosion)
         
         // Create an explosion animation when the snake
         // gets the food. The explosion is a layer that
@@ -486,7 +480,7 @@ final class GameVC: NSViewController {
         
         let explosion = CALayer()
         explosion.frame = foodLayer.frame
-        explosion.borderColor = kExplosionColor.CGColor
+        explosion.borderColor = kExplosionColor.cgColor
         explosion.borderWidth = CGFloat(kStep)
         explosion.opacity = 0
         
@@ -496,7 +490,7 @@ final class GameVC: NSViewController {
         animExpand.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
         animExpand.calculationMode = "discrete"
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
-        animExpand.values = (3 * kStep).stride(through: 6 * kStep, by: 2).map {
+        animExpand.values = stride(from: (3 * kStep), through: 6 * kStep, by: 2).map {
             NSValue(size: NSSize(width: $0, height: $0))
         }
         
@@ -516,8 +510,8 @@ final class GameVC: NSViewController {
         CATransaction.setCompletionBlock({
             explosion.removeFromSuperlayer()
         })
-        explosion.addAnimation(animExpand,  forKey: "expand")
-        explosion.addAnimation(animFadeOut, forKey: "fadeout")
+        explosion.add(animExpand,  forKey: "expand")
+        explosion.add(animFadeOut, forKey: "fadeout")
         CATransaction.commit()
     }
     
@@ -561,7 +555,6 @@ final class GameVC: NSViewController {
     // MARK: - Animate board
     
     func animateBoard() {
-        
         // The board animates when certain score
         // thresholds are exceeded.
         
@@ -574,17 +567,17 @@ final class GameVC: NSViewController {
             // the floor (wallLayer.backgroundColor).
 
             wallLayer.borderWidth = 2
-            wallLayer.backgroundColor = NSColor(white: 1, alpha: 0.1).CGColor
+            wallLayer.backgroundColor = NSColor(white: 1, alpha: 0.1).cgColor
             wallsEnabled = false
             let spinAnim = CAKeyframeAnimation(keyPath: "transform")
             spinAnim.values = (0...4).map {
                 let angle = CGFloat($0) * CGFloat(-M_PI/2)
-                return NSValue(CATransform3D: CATransform3DRotate(self.replLayer.transform, angle, 0, 0, 1))
+                return NSValue(caTransform3D: CATransform3DRotate(self.replLayer.transform, angle, 0, 0, 1))
             }
             spinAnim.duration = 25
             spinAnim.repeatCount = Float.infinity
-            replLayer.addAnimation(spinAnim, forKey: "spin")
-            SharedAudio.playSound(kSoundSpinBoard)
+            replLayer.add(spinAnim, forKey: "spin")
+            SharedAudio.play(sound: kSoundSpinBoard)
         }
             
         else if scoreLabel.score > kScoreRotate && wallsEnabled {
@@ -595,7 +588,7 @@ final class GameVC: NSViewController {
             CATransaction.setAnimationDuration(0.3)
             replLayer.transform = CATransform3DRotate(replLayer.transform, -15 * CGFloat(M_PI/180), 0, 0, 1)
             CATransaction.commit()
-            SharedAudio.playSound(kSoundRotateBoard)
+            SharedAudio.play(sound: kSoundRotateBoard)
         }
         
         else if scoreLabel.score > kScore3D && CATransform3DEqualToTransform(replLayer.transform, CATransform3DIdentity) {
@@ -610,32 +603,32 @@ final class GameVC: NSViewController {
             CATransaction.setAnimationDuration(1)
             replLayer.transform = t
             CATransaction.commit()
-            SharedAudio.playSound(kSoundAnimateTo3D)
+            SharedAudio.play(sound: kSoundAnimateTo3D)
         }
     }
     
     // MARK: - Timer
     
     func startTimer() {
-        let delta: UInt64 // nanoseconds between timer ticks
+        let delta: Int // nanoseconds between timer ticks
         switch level {
-        case .Slow:   delta = UInt64( kLevel1SecPerFrame * Double(NSEC_PER_SEC) )
-        case .Medium: delta = UInt64( kLevel2SecPerFrame * Double(NSEC_PER_SEC) )
-        case .Fast:   delta = UInt64( kLevel3SecPerFrame * Double(NSEC_PER_SEC) )
+        case .slow:   delta = Int( kLevel1SecPerFrame * Double(NSEC_PER_SEC) )
+        case .medium: delta = Int( kLevel2SecPerFrame * Double(NSEC_PER_SEC) )
+        case .fast:   delta = Int( kLevel3SecPerFrame * Double(NSEC_PER_SEC) )
         }
-        dispatch_source_set_timer(timer, dispatch_time(0, Int64(delta)), delta, 0)
-        dispatch_source_set_event_handler(timer) { [unowned self] in
+        timer.scheduleRepeating(deadline: .now() + .nanoseconds(delta), interval: .nanoseconds(delta))
+        timer.setEventHandler { [unowned self] in
             self.updateGame()
         }
-        dispatch_resume(timer)
+        timer.resume()
     }
     
     // MARK: - Snake-segment explosion animation did stop
     
-    override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         // Remove the segment layer when its animation is done. See
-        // the .Victorious section of gameOver() for animation code.
-        if let layer = anim.valueForKey("segmentLayer") {
+        // the .victorious section of gameOver() for animation code.
+        if let layer = anim.value(forKey: "segmentLayer") as? CALayer {
             layer.removeFromSuperlayer()
         }
     }

@@ -17,7 +17,6 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
     let scoreLabel = SnkScoreLabel(fgColor: kLogoColor)
     
     init(level: SnkLevel, target: AnyObject?, action: Selector) {
-        
         super.init(frame: NSZeroRect)
         
         // There are 2 parts: the level button and the high
@@ -38,12 +37,12 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         button.action = action
         button.tag = level.rawValue
         button.keyEquivalent = String(level.rawValue)
-        button.keyEquivalentModifierMask = 0 // No modifier
+        button.keyEquivalentModifierMask = NSEventModifierFlags(rawValue: 0) // No modifier
         button.delegate = self
 
         // Button dimensions. Button shows a border.
         
-        button.makeWidth(48 * kScale, height: 48 * kScale)
+        button.makeConstraints(width: 48 * kScale, height: 48 * kScale)
         button.borderHighlightColor = kLevelButtonBorderColor
         button.dimmedAlpha = 1
         
@@ -52,8 +51,8 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         let numberView = SnkImageView(named: String(level.rawValue), tint: kLevelButtonNumberColor, scale: 5)
         button.addSubview(numberView)
         numberView.alphaValue = 0.3
-        numberView.centerXWithView(button)
-        numberView.centerYWithView(button)
+        numberView.centerX(with: button)
+        numberView.centerY(with: button)
         
         // Set up a key-frame animation for the snake. 
         // There are 24 frames in the animation and the
@@ -66,8 +65,8 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
             NSValue(rect: NSRect(x: CGFloat($0)/24, y: 0, width: 1/24, height: 1))
         }
         switch level { // anim duration matches level speed
-        case .Slow:   snakeAnim.duration = 24 * kLevel1SecPerFrame
-        case .Medium: snakeAnim.duration = 24 * kLevel2SecPerFrame
+        case .slow:   snakeAnim.duration = 24 * kLevel1SecPerFrame
+        case .medium: snakeAnim.duration = 24 * kLevel2SecPerFrame
         default:      snakeAnim.duration = 24 * kLevel3SecPerFrame
         }
         
@@ -78,14 +77,14 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         // The animated snake for level 2 is rotated 90 degrees
         // because the alternating orientation looks better.
         
-        if level == .Medium {
+        if level == .medium {
             snakeLayer.transform = CATransform3DMakeRotation(CGFloat(M_PI_2), 0, 0, 1)
         }
         
-        snakeLayer.autoresizingMask = [.LayerWidthSizable, .LayerHeightSizable]
+        snakeLayer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
         snakeLayer.magnificationFilter = kCAFilterNearest
-        snakeLayer.contents = NSImage(named: "frames")?.tint(kSnakeColor)
-        snakeLayer.addAnimation(snakeAnim, forKey: "snakeAnim")
+        snakeLayer.contents = NSImage(named: "frames")?.tint(color: kSnakeColor)
+        snakeLayer.add(snakeAnim, forKey: "snakeAnim")
         
         // Create a view to host the snake layer and center it
         // within the button.
@@ -94,11 +93,11 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         snakeLayerHostingView.wantsLayer = true
         snakeLayerHostingView.layer = CALayer()
         snakeLayerHostingView.layer?.addSublayer(snakeLayer)
-        snakeLayerHostingView.makeWidth(32 * kScale, height: 32 * kScale)
+        snakeLayerHostingView.makeConstraints(width: 32 * kScale, height: 32 * kScale)
 
         button.addSubview(snakeLayerHostingView)
-        snakeLayerHostingView.centerXWithView(button)
-        snakeLayerHostingView.centerYWithView(button)
+        snakeLayerHostingView.centerX(with: button)
+        snakeLayerHostingView.centerY(with: button)
 
         // Ok, the level button is done!
         
@@ -107,11 +106,11 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         
         var keyPath = "values."
         switch level {
-        case .Slow:   keyPath += kHiScoreSlowKey
-        case .Medium: keyPath += kHiScoreMediumKey
+        case .slow:   keyPath += kHiScoreSlowKey
+        case .medium: keyPath += kHiScoreMediumKey
         default:      keyPath += kHiScoreFastKey
         }
-        scoreLabel.bind("score", toObject: NSUserDefaultsController.sharedUserDefaultsController(), withKeyPath: keyPath, options: nil)
+        scoreLabel.bind("score", to: NSUserDefaultsController.shared(), withKeyPath: keyPath, options: nil)
         scoreLabel.alphaValue = kScoreDimmedAlpha
 
         // Ok, the score label is done!
@@ -127,19 +126,22 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         self.addSubview(button)
         self.addSubview(scoreLabel)
         
-        let makeConstraints = self.constraintMakerWithMetrics(["a": 4 * kScale], views: ["button": button, "score": scoreLabel])
+        let metrics = ["a": 4 * kScale]
+        let views = ["button": button, "score": scoreLabel] as [String : Any]
         
-        makeConstraints("V:|[button]-a-[score]|", .AlignAllCenterX)
-        makeConstraints("H:|[button]|", [])
+        self.makeConstraints(metrics: metrics as [String : NSNumber], views: views, formatsAndOptions: [
+            ("V:|[button]-a-[score]|", .alignAllCenterX),
+            ("H:|[button]|", [])
+        ])
     }
     
     // When the hover state of the button changes, change
     // the alphaValue of the score label.
     
-    func hoverChangedForButton(button: SnkHoverButton) {
+    func hoverChanged(for button: SnkHoverButton) {
         scoreLabel.alphaValue = button.hovering ? 1 : kScoreDimmedAlpha
         if button.hovering {
-            SharedAudio.playSound(kSoundHover, volume: 0.3)
+            SharedAudio.play(sound: kSoundHover, volume: 0.3)
         }
     }
     

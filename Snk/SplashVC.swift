@@ -26,8 +26,8 @@ final class SplashVC: NSViewController {
         // fade in in viewDidAppear().
         
         view.addSubview(logoView)
-        view.centerXWithView(logoView)
-        view.centerYWithView(logoView)
+        view.centerX(with: logoView)
+        view.centerY(with: logoView)
         view.alphaValue = 0
     }
     
@@ -36,12 +36,12 @@ final class SplashVC: NSViewController {
         
         // Fade-in view, load sounds, wait 0.5s, transition to MenuVC.
         
-        view.fadeInAfterDelay(0.2, duration: 0.5) {
+        view.fadeIn(after: 0.2, duration: 0.5) {
             SharedAudio.loadSounds()
-            mo_dispatch_after(0.5) {
-                SharedAudio.playSound(kSoundStartup)
-                let mainVC = self.parentViewController as! MainVC
-                mainVC.transitionToViewController(MenuVC(), options: [.SlideUp, .Crossfade])
+            moDispatch(after: 0.5) {
+                SharedAudio.play(sound: kSoundStartup)
+                let mainVC = self.parent as! MainVC
+                mainVC.transition(to: MenuVC(), options: [.slideUp, .crossfade])
             }
         }
     }

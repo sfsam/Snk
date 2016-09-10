@@ -8,7 +8,7 @@ import Cocoa
 // its hover state has changed.
 
 protocol SnkHoverButtonDelegate: class {
-    func hoverChangedForButton(button: SnkHoverButton)
+    func hoverChanged(for button: SnkHoverButton)
 }
 
 // SnkHoverButton shows its content in a dimmed state
@@ -24,13 +24,13 @@ class SnkHoverButton: NSButton {
     // Appearance customization.
     
     var bgHighlightColor = NSColor(white: 1, alpha: 0.4)
-    var borderHighlightColor = NSColor.clearColor()
+    var borderHighlightColor = NSColor.clear
     var borderWidth: CGFloat = 4
     var dimmedAlpha: CGFloat = 0.4
     
     var hovering = false {
         didSet {
-            delegate?.hoverChangedForButton(self)
+            delegate?.hoverChanged(for: self)
         }
     }
     
@@ -38,8 +38,8 @@ class SnkHoverButton: NSButton {
         super.init(frame: frameRect)
         self.wantsLayer = true
         self.title = ""
-        self.bordered = false
-        self.bezelStyle = .RegularSquareBezelStyle
+        self.isBordered = false
+        self.bezelStyle = .regularSquare
         self.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -47,7 +47,7 @@ class SnkHoverButton: NSButton {
         self.init()
         let imageView = SnkImageView(named: imageName, tint: tint, scale: scale)
         self.addSubview(imageView)
-        self.alignFrameWithView(imageView)
+        self.alignFrame(with: imageView)
     }
     
     override var wantsUpdateLayer: Bool {
@@ -58,34 +58,33 @@ class SnkHoverButton: NSButton {
         for trackingArea in self.trackingAreas {
             removeTrackingArea(trackingArea as NSTrackingArea)
         }
-        let ta = NSTrackingArea(rect: NSZeroRect, options: ([.MouseEnteredAndExited, .ActiveAlways, .InVisibleRect, .EnabledDuringMouseDrag]), owner: self, userInfo: nil)
+        let ta = NSTrackingArea(rect: NSZeroRect, options: ([.mouseEnteredAndExited, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag]), owner: self, userInfo: nil)
         addTrackingArea(ta)
     }
     
-    override func mouseEntered(theEvent: NSEvent) {
+    override func mouseEntered(with theEvent: NSEvent) {
         hovering = true
         needsDisplay = true
     }
     
-    override func mouseExited(theEvent: NSEvent) {
+    override func mouseExited(with theEvent: NSEvent) {
         hovering = false
         needsDisplay = true
     }
     
     override func updateLayer() {
-        
         // Set the button's alphaValue, border color, and
         // background color depending on its highlight and
         // hovering state.
         
-        let alpha  = highlighted || hovering ? 1 : dimmedAlpha
-        let border = highlighted || hovering ? borderHighlightColor : NSColor.clearColor()
-        let bg     = highlighted ? bgHighlightColor : NSColor.clearColor()
+        let alpha  = isHighlighted || hovering ? 1 : dimmedAlpha
+        let border = isHighlighted || hovering ? borderHighlightColor : NSColor.clear
+        let bg     = isHighlighted ? bgHighlightColor : NSColor.clear
         
         self.alphaValue = alpha
         self.layer?.borderWidth = borderWidth * kScale
-        self.layer?.borderColor = border.CGColor
-        self.layer?.backgroundColor = bg.CGColor
+        self.layer?.borderColor = border.cgColor
+        self.layer?.backgroundColor = bg.cgColor
     }
     
     required init?(coder: NSCoder) {

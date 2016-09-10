@@ -13,12 +13,20 @@ class MoView: NSView {
     
     // Optional background color.
     
-    var bgColor: NSColor?
+    var bgColor: NSColor? {
+        didSet {
+            needsDisplay = true
+        }
+    }
     
     // Optional draw block allows custom drawing without subclassing.
     // The block is passed the current context and the view bounds.
     
-    var drawBlock: ((ctx: CGContextRef, bounds: NSRect) -> ())?
+    var drawBlock: ((_ context: CGContext, _ bounds: NSRect) -> Void)? {
+        didSet {
+            needsDisplay = true
+        }
+    }
     
     // By default, do not translate autoresizing mask into constraints
     // so doing Auto Layout in code is a little more efficient.
@@ -28,23 +36,22 @@ class MoView: NSView {
         self.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    override func drawRect(dirtyRect: NSRect) {
-        
+    override func draw(_ dirtyRect: NSRect) {
         // Fill with optional background color.
         
         if let color = bgColor {
             color.set()
-            NSRectFillUsingOperation(bounds, .CompositeSourceOver)
+            NSRectFillUsingOperation(bounds, .sourceOver)
         }
         
         // Draw with optional draw block.
         
         if let block = drawBlock {
-            let ctx = NSGraphicsContext.currentContext()!.CGContext
-            block(ctx: ctx, bounds: bounds)
+            let context = NSGraphicsContext.current()!.cgContext
+            block(context, bounds)
         }
         
-        super.drawRect(dirtyRect)
+        super.draw(dirtyRect)
     }
     
     required init?(coder: NSCoder) {

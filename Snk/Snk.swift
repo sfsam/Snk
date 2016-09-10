@@ -15,17 +15,17 @@ let kBigBoardKey      = "BigBoard"
 
 // MARK: - Sounds
 
-let kSoundStartup      = "splash.mp3"
-let kSoundHover        = "tick.mp3"
-let kSoundStartGame    = "lance.mp3"
-let kSoundFoodExposion = "boop.mp3"
-let kSoundAnimateTo3D  = "3d.mp3"
-let kSoundRotateBoard  = "tick.mp3"
-let kSoundSpinBoard    = "spin.mp3"
-let kSoundCrash        = "explosion.mp3"
-let kSoundGameOver     = "gameover.mp3"
-let kSoundOk           = "woosh.mp3"
-let kSoundVictory      = "tada.mp3"
+let kSoundStartup       = "splash.mp3"
+let kSoundHover         = "tick.mp3"
+let kSoundStartGame     = "lance.mp3"
+let kSoundFoodExplosion = "boop.mp3"
+let kSoundAnimateTo3D   = "3d.mp3"
+let kSoundRotateBoard   = "tick.mp3"
+let kSoundSpinBoard     = "spin.mp3"
+let kSoundCrash         = "explosion.mp3"
+let kSoundGameOver      = "gameover.mp3"
+let kSoundOk            = "woosh.mp3"
+let kSoundVictory       = "tada.mp3"
 
 // MARK: - Music
 
@@ -50,13 +50,13 @@ let kBaseStep = 12
 // Both kScale and kStep are var instead of let
 // because they can be reset if the user decides to
 // toggle the size. See AppDelegate toggleBoardSize().
-var kScale: CGFloat = NSUserDefaults.standardUserDefaults().boolForKey(kBigBoardKey) ? 2 : 1
+var kScale: CGFloat = UserDefaults.standard.bool(forKey: kBigBoardKey) ? 2 : 1
 var kStep = kBaseStep * Int(kScale)
 
 // MARK: - Game settings
 
 enum SnkLevel: Int {
-    case Slow = 1, Medium, Fast
+    case slow = 1, medium, fast
 }
 
 let kMaxScoreIncrement = 55
@@ -74,10 +74,10 @@ let kScore3D     = 450
 // MARK: - Colors
 
 let kBgColor = NSColor(red: 0.45, green: 0.73, blue: 1, alpha: 1)
-let kLogoColor = NSColor.whiteColor()
-let kSnakeColor = NSColor.whiteColor()
+let kLogoColor = NSColor.white
+let kSnakeColor = NSColor.white
 let kWallColor = NSColor(red: 1, green: 0.95, blue: 0.4, alpha:1)
-let kFoodColor = NSColor.whiteColor()
-let kExplosionColor = NSColor.whiteColor()
+let kFoodColor = NSColor.white
+let kExplosionColor = NSColor.white
 let kLevelButtonBorderColor = kWallColor
-let kLevelButtonNumberColor = NSColor.whiteColor()
+let kLevelButtonNumberColor = NSColor.white
