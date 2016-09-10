@@ -35,8 +35,8 @@ final class MainVC: NSViewController {
     override func loadView() {
         let v = MoView()
         
-        // Draw the title bar.
-        
+        // Fill background and draw title bar.
+        v.bgColor = kBgColor
         v.drawBlock = { (context, bounds) in
             // Title bar gradient.
             var rect = bounds

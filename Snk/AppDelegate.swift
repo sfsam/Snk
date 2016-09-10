@@ -25,19 +25,15 @@ final class MainWindow: NSWindow {
         NSApplication.shared().terminate(nil)
     }
     
-    // The window's background color depends on Main status.
-    // Also, when the window isn't Main, the content view is
-    // slightly faded.
+    // Fade the contentView when the window resigns Main.
 
     override func becomeMain() {
         super.becomeMain()
-        backgroundColor = kBgColor
         contentView?.alphaValue = 1
     }
     override func resignMain() {
         super.resignMain()
-        backgroundColor = kBgColor.blended(withFraction: 0.3, of: NSColor.white)
-        contentView?.alphaValue = 0.8
+        contentView?.alphaValue = 0.6
     }
 }
 
@@ -67,11 +63,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func showMainWindow() {
+        // If we are re-showing the window (because the
+        // user toggle its size), first make sure it is 
+        // not miniturized and not showing.
+        if mainWC.window?.isMiniaturized == true {
+            mainWC.window?.deminiaturize(nil)
+        }
+        mainWC.window?.orderOut(nil)
+        
         mainWC.contentViewController = MainVC()
-        
-        // Set the window background color.
-        
-        mainWC.window?.backgroundColor = kBgColor
         
         // Fade the window in.
         mainWC.window?.alphaValue = 0
@@ -116,12 +116,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         kScale = bigBoard ? 2 : 1
         kStep = kBaseStep * Int(kScale)
         
-        if mainWC.window?.isMiniaturized == true {
-            mainWC.window?.deminiaturize(nil)
-        }
-        
-        mainWC.window?.orderOut(nil)
-
         showMainWindow()
     }
 }
