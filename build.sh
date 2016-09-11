@@ -12,7 +12,6 @@ VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PLIST_F
 
 # Set up file names and paths.
 BUILD_PATH=$(mktemp -dt "Snk")
-APP_PATH="$BUILD_PATH/Build/Products/Release/Snk.app"
 SPARKLE_ZIP_NAME="Snk-$VERSION.zip"
 SPARKLE_ZIP_PATH1="$HOME/Desktop/$SPARKLE_ZIP_NAME"
 SPARKLE_ZIP_PATH2="$HOME/Desktop/Snk.zip"
@@ -25,9 +24,10 @@ xcodebuild -scheme Snk \
            build
 
 # Compress the app.
+cd "$BUILD_PATH/Build/Products/Release"
 rm -f "$SPARKLE_ZIP_PATH1"
 rm -f "$SPARKLE_ZIP_PATH2"
-zip -r -y "$SPARKLE_ZIP_PATH1" "$APP_PATH"
+zip -r -y "$SPARKLE_ZIP_PATH1" Snk.app
 cp "$SPARKLE_ZIP_PATH1" "$SPARKLE_ZIP_PATH2"
 
 # Get the date and zip file size for the Sparkle XML.
@@ -43,7 +43,7 @@ cat > "$SPARKLE_XML_PATH" <<EOF
   xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Snk Changelog</title>
-<link>http://s3.amazonaws.com/mowglii/snk.xml</link>
+<link>https://s3.amazonaws.com/mowglii/snk.xml</link>
 <description>Most recent changes</description>
 <language>en</language>
 <item>
