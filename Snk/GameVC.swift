@@ -40,7 +40,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     let scoreLabel = SnkScoreLabel(fgColor: SharedTheme.color(.background), bgColor: SharedTheme.color(.wall))
     var scoreIncrement = kMaxScoreIncrement
     
-    let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+    let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
 
     // The snake is represented by a list of points with
     // the head at the end of the list (snakePoints.last).
@@ -618,7 +618,9 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         }
         timer.scheduleRepeating(deadline: .now() + .nanoseconds(delta), interval: .nanoseconds(delta))
         timer.setEventHandler { [unowned self] in
-            self.updateGame()
+            DispatchQueue.main.async {
+                self.updateGame()
+            }
         }
         timer.resume()
     }
