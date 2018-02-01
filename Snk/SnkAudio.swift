@@ -18,8 +18,8 @@ final class SnkAudio: NSObject {
     // User preferences to enable sounds and music. What we
     // will really do is mute or unmute the sound so that
     // it can be resumed if the value is changed midstream.
-    var soundsEnabled = true
-    var musicEnabled: Bool = true {
+    @objc var soundsEnabled = true
+    @objc var musicEnabled: Bool = true {
         didSet {
             guard let music = music else { return }
             music.volume = musicEnabled ? musicVolume : 0
@@ -41,8 +41,8 @@ final class SnkAudio: NSObject {
         // properties to the corresponding defaults
         // which the user can change at any time.
         
-        self.bind("soundsEnabled", to: NSUserDefaultsController.shared(), withKeyPath: "values." + kEnableSoundsKey, options: nil)
-        self.bind("musicEnabled", to: NSUserDefaultsController.shared(), withKeyPath: "values." + kEnableMusicKey, options: nil)
+        self.bind(NSBindingName(rawValue: "soundsEnabled"), to: NSUserDefaultsController.shared, withKeyPath: "values." + kEnableSoundsKey, options: nil)
+        self.bind(NSBindingName(rawValue: "musicEnabled"), to: NSUserDefaultsController.shared, withKeyPath: "values." + kEnableMusicKey, options: nil)
     }
     
     func loadSounds() {
@@ -50,7 +50,7 @@ final class SnkAudio: NSObject {
         // sounds so we can play them instantly later.
         
         for filePath in [kSoundStartup, kSoundHover, kSoundStartGame, kSoundFoodExplosion, kSoundAnimateTo3D, kSoundRotateBoard, kSoundSpinBoard, kSoundCrash, kSoundGameOver, kSoundOk, kSoundVictory] {
-            sounds[filePath] = NSSound(named: filePath)!
+            sounds[filePath] = NSSound(named: NSSound.Name(rawValue: filePath))!
         }
     }
     
@@ -68,7 +68,7 @@ final class SnkAudio: NSObject {
     
     func play(music filePath: String, volume: Float = 1, loop: Bool = false) {
         stopMusic()
-        music = NSSound(named: filePath)
+        music = NSSound(named: NSSound.Name(rawValue: filePath))
         guard let music = music else { return }
         music.volume = musicEnabled ? volume : 0
         music.loops = loop

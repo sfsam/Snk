@@ -50,7 +50,7 @@ final class MainVC: NSViewController {
             rect.origin.y = bounds.height - 1
             rect.size.height = 1
             NSColor(white: 1, alpha: 0.5).set()
-            NSRectFillUsingOperation(rect, .sourceOver)
+            rect.fill(using: .sourceOver)
         }
 
         v.addSubview(contentView)
@@ -96,7 +96,7 @@ final class MainVC: NSViewController {
     // Transition to a new childVC. This method is called
     // by childVCs to transition to a new child.
     
-    func transition(to newVC: NSViewController, options: NSViewControllerTransitionOptions) {
+    func transition(to newVC: NSViewController, options: NSViewController.TransitionOptions) {
         // oldVC: Deactivate the constraints that bind oldVC's
         // view to self.contentView so that oldVC's view can
         // animate out.

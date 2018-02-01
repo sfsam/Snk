@@ -37,7 +37,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         button.action = action
         button.tag = level.rawValue
         button.keyEquivalent = String(level.rawValue)
-        button.keyEquivalentModifierMask = NSEventModifierFlags(rawValue: 0) // No modifier
+        button.keyEquivalentModifierMask = NSEvent.ModifierFlags(rawValue: 0) // No modifier
         button.delegate = self
 
         // Button dimensions. Button shows a border.
@@ -78,12 +78,12 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         // because the alternating orientation looks better.
         
         if level == .medium {
-            snakeLayer.transform = CATransform3DMakeRotation(CGFloat(M_PI_2), 0, 0, 1)
+            snakeLayer.transform = CATransform3DMakeRotation(CGFloat(Double.pi/2), 0, 0, 1)
         }
         
         snakeLayer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
         snakeLayer.magnificationFilter = kCAFilterNearest
-        snakeLayer.contents = NSImage(named: "frames")?.tint(color: SharedTheme.color(.snake))
+        snakeLayer.contents = NSImage(named: NSImage.Name(rawValue: "frames"))?.tint(color: SharedTheme.color(.snake))
         snakeLayer.add(snakeAnim, forKey: "snakeAnim")
         
         // Create a view to host the snake layer and center it
@@ -110,7 +110,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         case .medium: keyPath += kHiScoreMediumKey
         default:      keyPath += kHiScoreFastKey
         }
-        scoreLabel.bind("score", to: NSUserDefaultsController.shared(), withKeyPath: keyPath, options: nil)
+        scoreLabel.bind(NSBindingName(rawValue: "score"), to: NSUserDefaultsController.shared, withKeyPath: keyPath, options: nil)
         scoreLabel.alphaValue = kScoreDimmedAlpha
 
         // Ok, the score label is done!
@@ -130,7 +130,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         let views = ["button": button, "score": scoreLabel] as [String : Any]
         
         self.makeConstraints(metrics: metrics as [String : NSNumber], views: views, formatsAndOptions: [
-            ("V:|[button]-a-[score]|", .alignAllCenterX),
+            ("V:|[button]-a-[score]|", NSLayoutConstraint.FormatOptions.alignAllCenterX),
             ("H:|[button]|", [])
         ])
     }

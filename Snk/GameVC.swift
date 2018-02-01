@@ -389,21 +389,21 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         }
     }
     
-    func goToMenu() {
+    @objc func goToMenu() {
         // User pressed the OK button after a game.
         // Go back to the main menu.
         
         SharedAudio.stopEverything()
         SharedAudio.play(sound: kSoundOk)
         let mainVC = self.parent as! MainVC
-        mainVC.transition(to: MenuVC(), options: .slideRight)
+        mainVC.transition(to: MenuVC(), options: NSViewController.TransitionOptions.slideRight)
     }
     
     private func play(level: SnkLevel) {
         guard state == .gameOver else { return }
         SharedAudio.stopEverything()
         let mainVC = self.parent as! MainVC
-        mainVC.transition(to: GameVC(level: level), options: .slideLeft)
+        mainVC.transition(to: GameVC(level: level), options: NSViewController.TransitionOptions.slideLeft)
         SharedAudio.play(sound: kSoundStartGame)
     }
     
@@ -571,7 +571,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             wallsEnabled = false
             let spinAnim = CAKeyframeAnimation(keyPath: "transform")
             spinAnim.values = (0...4).map {
-                let angle = CGFloat($0) * CGFloat(-M_PI/2)
+                let angle = CGFloat($0) * CGFloat(-Double.pi/2)
                 return NSValue(caTransform3D: CATransform3DRotate(self.replLayer.transform, angle, 0, 0, 1))
             }
             spinAnim.duration = 25
@@ -586,7 +586,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             
             CATransaction.begin()
             CATransaction.setAnimationDuration(0.3)
-            replLayer.transform = CATransform3DRotate(replLayer.transform, -15 * CGFloat(M_PI/180), 0, 0, 1)
+            replLayer.transform = CATransform3DRotate(replLayer.transform, -15 * CGFloat(Double.pi/180), 0, 0, 1)
             CATransaction.commit()
             SharedAudio.play(sound: kSoundRotateBoard)
         }
@@ -598,7 +598,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             var t = CATransform3DIdentity
             t.m34 = -1/400
             t = CATransform3DTranslate(t, 0, 10, -75);
-            t = CATransform3DRotate(t, -30 * CGFloat(M_PI)/180, 1, 0, 0.2)
+            t = CATransform3DRotate(t, -30 * CGFloat(Double.pi)/180, 1, 0, 0.2)
             CATransaction.begin()
             CATransaction.setAnimationDuration(1)
             replLayer.transform = t
@@ -616,7 +616,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         case .medium: delta = Int( kLevel2SecPerFrame * Double(NSEC_PER_SEC) )
         case .fast:   delta = Int( kLevel3SecPerFrame * Double(NSEC_PER_SEC) )
         }
-        timer.scheduleRepeating(deadline: .now() + .nanoseconds(delta), interval: .nanoseconds(delta))
+        timer.schedule(deadline: .now() + .nanoseconds(delta), repeating: .nanoseconds(delta))
         timer.setEventHandler { [unowned self] in
             DispatchQueue.main.async {
                 self.updateGame()

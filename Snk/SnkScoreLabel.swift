@@ -30,7 +30,7 @@ final class SnkScoreLabel: MoView {
     
     // Validate score, set view size, and draw it.
     
-    var score: Int = 0 {
+    @objc var score: Int = 0 {
         didSet {
             self.score = max(0, self.score) // enforce score >= 0
             self.invalidateIntrinsicContentSize()
@@ -41,7 +41,7 @@ final class SnkScoreLabel: MoView {
     // View size changes to fit digits in score.
     
     override var intrinsicContentSize: CGSize {
-        let numberOfDigits = CGFloat(String(score).characters.count)
+        let numberOfDigits = CGFloat(String(score).count)
         // Each digit is 12x14 points + 1 on each side for margin
         let width = numberOfDigits * (12 * kScale) + (2 * kScale)
         return CGSize(width: width, height: 14 * kScale)
@@ -53,8 +53,8 @@ final class SnkScoreLabel: MoView {
     // Create a score label with a digit background.
 
     init(fgColor: NSColor, bgColor: NSColor) {
-        self.digitsFg = NSImage(named: "digitsfg")?.tint(color: fgColor)
-        self.digitsBg = NSImage(named: "digitsbg")?.tint(color: bgColor)
+        self.digitsFg = NSImage(named: NSImage.Name(rawValue: "digitsfg"))?.tint(color: fgColor)
+        self.digitsBg = NSImage(named: NSImage.Name(rawValue: "digitsbg"))?.tint(color: bgColor)
         
         super.init(frame: NSZeroRect)
         
@@ -70,7 +70,7 @@ final class SnkScoreLabel: MoView {
             // the digit foreground on top of it.
             
             let scoreString = String(self.score)
-            for (index, digitCharacter) in scoreString.characters.enumerated() {
+            for (index, digitCharacter) in scoreString.enumerated() {
                 let digit  = Int( String(digitCharacter) )!
                 let toOffset   = 12 * kScale * CGFloat(index)
                 let toWidth    = 14 * kScale

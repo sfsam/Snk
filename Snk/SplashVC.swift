@@ -41,7 +41,7 @@ final class SplashVC: NSViewController {
             moDispatch(after: 0.5) {
                 SharedAudio.play(sound: kSoundStartup)
                 let mainVC = self.parent as! MainVC
-                mainVC.transition(to: MenuVC(), options: [.slideUp, .crossfade])
+                mainVC.transition(to: MenuVC(), options: [NSViewController.TransitionOptions.slideUp, NSViewController.TransitionOptions.crossfade])
             }
         }
     }

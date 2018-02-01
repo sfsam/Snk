@@ -14,7 +14,7 @@ final class MainWindow: NSWindow {
     // so that we can draw our own custom title bar.
 
     convenience init() {
-        self.init(contentRect: NSZeroRect, styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)
+        self.init(contentRect: NSZeroRect, styleMask: [NSWindow.StyleMask.titled, NSWindow.StyleMask.closable, NSWindow.StyleMask.miniaturizable, NSWindow.StyleMask.fullSizeContentView], backing: .buffered, defer: false)
         self.titlebarAppearsTransparent = true
         self.standardWindowButton(.zoomButton)?.alphaValue = 0
     }
@@ -22,7 +22,7 @@ final class MainWindow: NSWindow {
     // The app terminates when the main window is closed.
 
     override func close() {
-        NSApplication.shared().terminate(nil)
+        NSApplication.shared.terminate(nil)
     }
     
     // Fade the contentView when the window resigns Main.
@@ -97,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.informativeText = NSLocalizedString("Do you really want to clear your best scores?", comment: "")
         alert.addButton(withTitle: NSLocalizedString("No", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Yes", comment: ""))
-        if alert.runModal() == NSAlertSecondButtonReturn {
+        if alert.runModal() == NSApplication.ModalResponse.alertSecondButtonReturn {
             UserDefaults.standard.set(0, forKey: kHiScoreSlowKey)
             UserDefaults.standard.set(0, forKey: kHiScoreMediumKey)
             UserDefaults.standard.set(0, forKey: kHiScoreFastKey)
@@ -124,7 +124,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         showMainWindow()
     }
 
-    func selectTheme(_ sender: NSMenuItem) {
+    @objc func selectTheme(_ sender: NSMenuItem) {
         let newIndex = sender.tag
         let oldIndex = SharedTheme.themeIndex
         guard newIndex != oldIndex else {
@@ -132,8 +132,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         // Uncheck old theme menu item, check new one.
-        themesMenu?.item(at: oldIndex)?.state = 0
-        themesMenu?.item(at: newIndex)?.state = 1
+        themesMenu?.item(at: oldIndex)?.state = NSControl.StateValue(rawValue: 0)
+        themesMenu?.item(at: newIndex)?.state = NSControl.StateValue(rawValue: 1)
         
         // Save the theme name and set the theme manager
         // to use the new one.
@@ -153,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for (index, theme) in SharedTheme.themes.enumerated() {
             let item = NSMenuItem()
             item.title = theme.name.rawValue
-            item.state = index == SharedTheme.themeIndex ? 1 : 0
+            item.state = NSControl.StateValue(rawValue: index == SharedTheme.themeIndex ? 1 : 0)
             item.tag = index
             item.action = #selector(selectTheme(_:))
             themesMenu?.addItem(item)

@@ -43,8 +43,8 @@ final class MenuVC: NSViewController {
         let views = ["logo": logo, "button1": button1, "button2": button2, "button3": button3]
         
         view.makeConstraints(metrics: metrics as [String : NSNumber]?, views: views, formatsAndOptions: [
-            ("V:|-a-[logo]-b-[button2]", .alignAllCenterX),
-            ("H:[button1]-b-[button2]-b-[button3]", .alignAllCenterY)
+            ("V:|-a-[logo]-b-[button2]", NSLayoutConstraint.FormatOptions.alignAllCenterX),
+            ("H:[button1]-b-[button2]-b-[button3]", NSLayoutConstraint.FormatOptions.alignAllCenterY)
         ])
     }
     
@@ -53,11 +53,11 @@ final class MenuVC: NSViewController {
         view.window?.makeFirstResponder(self)
     }
     
-    func activate(button: SnkHoverButton) {
+    @objc func activate(button: SnkHoverButton) {
         // The min/max dance guarantees rawValue = 1 or 2 or 3 only
         let level  = SnkLevel(rawValue: min(max(button.tag, 1), 3))!
         let mainVC = self.parent as! MainVC
-        mainVC.transition(to: GameVC(level: level), options: .slideLeft)
+        mainVC.transition(to: GameVC(level: level), options: NSViewController.TransitionOptions.slideLeft)
         SharedAudio.play(sound: kSoundStartGame)
     }
 }

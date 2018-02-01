@@ -41,13 +41,13 @@ class MoView: NSView {
         
         if let color = bgColor {
             color.set()
-            NSRectFillUsingOperation(bounds, .sourceOver)
+            bounds.fill(using: .sourceOver)
         }
         
         // Draw with optional draw block.
         
         if let block = drawBlock {
-            let context = NSGraphicsContext.current()!.cgContext
+            let context = NSGraphicsContext.current!.cgContext
             block(context, bounds)
         }
         

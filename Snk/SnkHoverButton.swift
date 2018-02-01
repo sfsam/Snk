@@ -58,7 +58,7 @@ class SnkHoverButton: NSButton {
         for trackingArea in self.trackingAreas {
             removeTrackingArea(trackingArea as NSTrackingArea)
         }
-        let ta = NSTrackingArea(rect: NSZeroRect, options: ([.mouseEnteredAndExited, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag]), owner: self, userInfo: nil)
+        let ta = NSTrackingArea(rect: NSZeroRect, options: ([NSTrackingArea.Options.mouseEnteredAndExited, NSTrackingArea.Options.activeAlways, NSTrackingArea.Options.inVisibleRect, NSTrackingArea.Options.enabledDuringMouseDrag]), owner: self, userInfo: nil)
         addTrackingArea(ta)
     }
     

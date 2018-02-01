@@ -53,7 +53,7 @@ extension NSView {
     // receiver and `view`. Specify `attribute` and `constant`.
     
     @discardableResult
-    func makeConstraint(with view: NSView, attribute: NSLayoutAttribute, constant: CGFloat) -> NSLayoutConstraint {
+    func makeConstraint(with view: NSView, attribute: NSLayoutConstraint.Attribute, constant: CGFloat) -> NSLayoutConstraint {
         let constraint = NSLayoutConstraint(item: self, attribute: attribute, relatedBy: .equal, toItem: view, attribute: attribute, multiplier: 1, constant: constant)
         constraint.isActive = true
         return constraint
@@ -154,7 +154,7 @@ extension NSView {
     // ])
     
     @discardableResult
-    func makeConstraints(metrics: [String: NSNumber]?, views: [String: Any], formatsAndOptions: [(format: String, options: NSLayoutFormatOptions)]) -> [NSLayoutConstraint] {
+    func makeConstraints(metrics: [String: NSNumber]?, views: [String: Any], formatsAndOptions: [(format: String, options: NSLayoutConstraint.FormatOptions)]) -> [NSLayoutConstraint] {
         var constraints = [NSLayoutConstraint]()
         for (format, options) in formatsAndOptions {
             constraints += NSLayoutConstraint.constraints(withVisualFormat: format, options: options, metrics: metrics, views: views)
@@ -197,7 +197,7 @@ extension NSViewController {
     
     // Add a `duration` parameter to transitionFromViewController(...).
     
-    func transition(from fromViewController: NSViewController, to toViewController: NSViewController, options: NSViewControllerTransitionOptions, duration: TimeInterval, completionHandler completion: (() -> Void)?) {
+    func transition(from fromViewController: NSViewController, to toViewController: NSViewController, options: NSViewController.TransitionOptions, duration: TimeInterval, completionHandler completion: (() -> Void)?) {
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = duration
             context.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
@@ -214,7 +214,7 @@ extension NSImage {
     
     func tint(color: NSColor) -> NSImage? {
         return NSImage(size: self.size, flipped: false, drawingHandler: { rect -> Bool in
-            let context = NSGraphicsContext.current()?.cgContext
+            let context = NSGraphicsContext.current?.cgContext
             context?.interpolationQuality = .none
             self.draw(in: NSRect(origin: CGPoint.zero, size: self.size))
             context?.setFillColor(color.cgColor)
