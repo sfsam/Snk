@@ -59,7 +59,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         // animation duration matches the level speed.
         
         let snakeAnim  = CAKeyframeAnimation(keyPath: "contentsRect")
-        snakeAnim.calculationMode = "discrete"
+        snakeAnim.calculationMode = .discrete
         snakeAnim.repeatCount = Float.infinity
         snakeAnim.values = (0...23).map {
             NSValue(rect: NSRect(x: CGFloat($0)/24, y: 0, width: 1/24, height: 1))
@@ -82,8 +82,8 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         }
         
         snakeLayer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
-        snakeLayer.magnificationFilter = kCAFilterNearest
-        snakeLayer.contents = NSImage(named: NSImage.Name(rawValue: "frames"))?.tint(color: SharedTheme.color(.snake))
+        snakeLayer.magnificationFilter = .nearest
+        snakeLayer.contents = NSImage(named: "frames")?.tint(color: SharedTheme.color(.snake))
         snakeLayer.add(snakeAnim, forKey: "snakeAnim")
         
         // Create a view to host the snake layer and center it

@@ -250,7 +250,7 @@
 					92175E881B14F3BD007151EA = {
 						CreatedOnToolsVersion = 6.3.2;
 						DevelopmentTeam = HFT3T55WND;
-						LastSwiftMigration = 0920;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -461,8 +461,7 @@
 				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mowglii.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Snk;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -479,8 +478,7 @@
 				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mowglii.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Snk;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

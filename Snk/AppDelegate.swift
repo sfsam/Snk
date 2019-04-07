@@ -14,7 +14,7 @@ final class MainWindow: NSWindow {
     // so that we can draw our own custom title bar.
 
     convenience init() {
-        self.init(contentRect: NSZeroRect, styleMask: [NSWindow.StyleMask.titled, NSWindow.StyleMask.closable, NSWindow.StyleMask.miniaturizable, NSWindow.StyleMask.fullSizeContentView], backing: .buffered, defer: false)
+        self.init(contentRect: NSZeroRect, styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)
         self.titlebarAppearsTransparent = true
         self.standardWindowButton(.zoomButton)?.alphaValue = 0
     }

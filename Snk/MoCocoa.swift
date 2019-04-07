@@ -174,7 +174,7 @@ extension NSView {
         moDispatch(after: delay) {
             NSAnimationContext.runAnimationGroup({ context in
                 context.duration = duration
-                context.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
                 self.animator().alphaValue = 1
             }, completionHandler: completionHandler)
         }
@@ -184,7 +184,7 @@ extension NSView {
         moDispatch(after: delay) {
             NSAnimationContext.runAnimationGroup({ context in
                 context.duration = duration
-                context.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+                context.timingFunction = CAMediaTimingFunction(name: .easeIn)
                 self.animator().alphaValue = 0
             }, completionHandler: completionHandler)
         }
@@ -200,7 +200,7 @@ extension NSViewController {
     func transition(from fromViewController: NSViewController, to toViewController: NSViewController, options: NSViewController.TransitionOptions, duration: TimeInterval, completionHandler completion: (() -> Void)?) {
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = duration
-            context.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
             self.transition(from: fromViewController, to: toViewController, options: options, completionHandler: completion)
         }, completionHandler: nil)
     }

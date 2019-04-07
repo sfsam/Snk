@@ -87,7 +87,7 @@ final class MainVC: NSViewController {
         super.viewDidLoad()
         
         let splashVC = SplashVC()
-        addChildViewController(splashVC)
+        addChild(splashVC)
         contentView.addSubview(splashVC.view)
         splashVC.view.shadow = shadow
         splashVC.view.alignFrame(with: contentView)
@@ -101,7 +101,7 @@ final class MainVC: NSViewController {
         // view to self.contentView so that oldVC's view can
         // animate out.
         
-        let oldVC = childViewControllers[0] // There is only ever 1 child.
+        let oldVC = children[0] // There is only ever 1 child.
         oldVC.view.translatesAutoresizingMaskIntoConstraints = true
         NSLayoutConstraint.deactivate(contentView.constraints)
 
@@ -109,7 +109,7 @@ final class MainVC: NSViewController {
         // set up the newVC's view's constraints yet so it can
         // animate in. We'll set constraints after animating.
         
-        addChildViewController(newVC)
+        addChild(newVC)
         newVC.view.translatesAutoresizingMaskIntoConstraints = true
         newVC.view.shadow = shadow
         
@@ -117,7 +117,7 @@ final class MainVC: NSViewController {
         
         transition(from: oldVC, to: newVC, options: options, duration: 0.25) {
             // Remove oldVC as a child and set up newVC's view's constraints.
-            oldVC.removeFromParentViewController()
+            oldVC.removeFromParent()
             newVC.view.translatesAutoresizingMaskIntoConstraints = false
             newVC.view.alignFrame(with: self.contentView)
         }

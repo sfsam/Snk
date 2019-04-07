@@ -50,7 +50,7 @@ final class SnkAudio: NSObject {
         // sounds so we can play them instantly later.
         
         for filePath in [kSoundStartup, kSoundHover, kSoundStartGame, kSoundFoodExplosion, kSoundAnimateTo3D, kSoundRotateBoard, kSoundSpinBoard, kSoundCrash, kSoundGameOver, kSoundOk, kSoundVictory] {
-            sounds[filePath] = NSSound(named: NSSound.Name(rawValue: filePath))!
+            sounds[filePath] = NSSound(named: filePath)!
         }
     }
     
@@ -68,7 +68,7 @@ final class SnkAudio: NSObject {
     
     func play(music filePath: String, volume: Float = 1, loop: Bool = false) {
         stopMusic()
-        music = NSSound(named: NSSound.Name(rawValue: filePath))
+        music = NSSound(named: filePath)
         guard let music = music else { return }
         music.volume = musicEnabled ? volume : 0
         music.loops = loop

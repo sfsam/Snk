@@ -11,7 +11,7 @@
 
 Snk is a Swift implementation of the classic game Snake for macOS 10.10+.
 
-Snk is written in Swift 4 and requires Xcode 9+.
+Snk is written in Swift 5 and requires Xcode 10.2+.
 
 This app uses the Sparkle framework which can be found here:
 http://sparkle-project.org/

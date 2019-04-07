@@ -166,10 +166,10 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         }
         if let chars = theEvent.charactersIgnoringModifiers {
             switch chars {
-            case "w", "W", key(NSUpArrowFunctionKey):    addDirection(.up)
-            case "s", "S", key(NSDownArrowFunctionKey):  addDirection(.down)
-            case "a", "A", key(NSLeftArrowFunctionKey):  addDirection(.left)
-            case "d", "D", key(NSRightArrowFunctionKey): addDirection(.right)
+            case "w", "W", key(NSEvent.SpecialKey.upArrow.rawValue):    addDirection(.up)
+            case "s", "S", key(NSEvent.SpecialKey.downArrow.rawValue):  addDirection(.down)
+            case "a", "A", key(NSEvent.SpecialKey.leftArrow.rawValue):  addDirection(.left)
+            case "d", "D", key(NSEvent.SpecialKey.rightArrow.rawValue): addDirection(.right)
             case "P":
                 if state == .playing || state == .paused {
                     state = state == .playing ? .paused : .playing
@@ -297,7 +297,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             let anim = CAKeyframeAnimation(keyPath: "position")
             let delta = UInt32(12 * kScale)
             anim.duration = 0.3
-            anim.calculationMode = "discrete"
+            anim.calculationMode = .discrete
             anim.values = (1...20).map { _ in
                 let x = self.view.layer!.position.x + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
                 let y = self.view.layer!.position.y + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
@@ -354,7 +354,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
                             let moveAnim = CAKeyframeAnimation(keyPath: "position")
                             moveAnim.path = animPath
                             moveAnim.duration = 0.5
-                            moveAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+                            moveAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
                             moveAnim.delegate = self
                             moveAnim.setValue(segment, forKey: "segmentLayer")
                             segment.add(moveAnim, forKey: nil)
@@ -457,7 +457,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         anim.duration = 0.25
         anim.repeatCount = Float.infinity
         anim.autoreverses = true
-        anim.calculationMode = "discrete"
+        anim.calculationMode = .discrete
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
         anim.values = stride(from: 4, through: kStep, by: 2).map {
             NSValue(size: NSSize(width: $0, height: $0))
@@ -487,8 +487,8 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         // Set up the expansion animation.
         
         let animExpand = CAKeyframeAnimation(keyPath: "bounds.size")
-        animExpand.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-        animExpand.calculationMode = "discrete"
+        animExpand.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        animExpand.calculationMode = .discrete
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
         animExpand.values = stride(from: (3 * kStep), through: 6 * kStep, by: 2).map {
             NSValue(size: NSSize(width: $0, height: $0))
@@ -497,7 +497,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         // Set up the fade out animtaion.
         
         let animFadeOut = CABasicAnimation(keyPath: "opacity")
-        animFadeOut.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        animFadeOut.timingFunction = CAMediaTimingFunction(name: .easeIn)
         animFadeOut.fromValue = 1
         animFadeOut.toValue   = 0
         

@@ -38,8 +38,8 @@ class SnkImageView: MoView {
     // is nil, don't tint the image.
     
     convenience init(named name: String, tint: NSColor?, scale: CGFloat = 1) {
-        let image = (tint == nil) ? NSImage(named: NSImage.Name(rawValue: name))
-                                  : NSImage(named: NSImage.Name(rawValue: name))?.tint(color: tint!)
+        let image = (tint == nil) ? NSImage(named: name)
+                                  : NSImage(named: name)?.tint(color: tint!)
         self.init(image: image, scale: scale)
     }
 

@@ -53,8 +53,8 @@ final class SnkScoreLabel: MoView {
     // Create a score label with a digit background.
 
     init(fgColor: NSColor, bgColor: NSColor) {
-        self.digitsFg = NSImage(named: NSImage.Name(rawValue: "digitsfg"))?.tint(color: fgColor)
-        self.digitsBg = NSImage(named: NSImage.Name(rawValue: "digitsbg"))?.tint(color: bgColor)
+        self.digitsFg = NSImage(named: "digitsfg")?.tint(color: fgColor)
+        self.digitsBg = NSImage(named: "digitsbg")?.tint(color: bgColor)
         
         super.init(frame: NSZeroRect)
         
