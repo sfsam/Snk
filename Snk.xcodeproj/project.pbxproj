@@ -257,10 +257,9 @@
 			};
 			buildConfigurationList = 92175E841B14F3BD007151EA /* Build configuration list for PBXProject "Snk" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
