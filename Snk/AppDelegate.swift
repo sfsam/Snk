@@ -53,12 +53,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         
         UserDefaults.standard.register(defaults: [
-            kHiScoreSlowKey:   0 as AnyObject,
-            kHiScoreMediumKey: 0 as AnyObject,
-            kHiScoreFastKey:   0 as AnyObject,
-            kEnableSoundsKey:  1 as AnyObject,
-            kEnableMusicKey:   1 as AnyObject,
-            kBigBoardKey:      0 as AnyObject
+            kHiScoreSlowKey:   0,
+            kHiScoreMediumKey: 0,
+            kHiScoreFastKey:   0,
+            kEnableSoundsKey:  true,
+            kEnableMusicKey:   true,
+            kBigBoardKey:      false,
         ])
         
         setupThemesMenu()
