@@ -49,9 +49,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet var themesMenu: NSMenu?
     
     let mainWC = NSWindowController(window: MainWindow())
+    
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Prevent "Enter Full Screen" from appearing in menu.
+        // stackoverflow.com/a/52158264/111418
+        UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        
         UserDefaults.standard.register(defaults: [
             kHiScoreSlowKey:   0,
             kHiScoreMediumKey: 0,
@@ -60,9 +65,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             kEnableMusicKey:   true,
             kBigBoardKey:      false,
         ])
-        
         setupThemesMenu()
-
         showMainWindow()
     }
     
