@@ -104,6 +104,7 @@
 		92ACF3191B2CB7AB007494A6 /* SnkImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnkImageView.swift; sourceTree = "<group>"; };
 		92C9D5811D83CEE5002B966F /* SnkTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnkTheme.swift; sourceTree = "<group>"; };
 		92EF54D01B242A3800A32629 /* SplashVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashVC.swift; sourceTree = "<group>"; };
+		92FACE12225AFD7C00B9EB06 /* Snk.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Snk.entitlements; sourceTree = "<group>"; };
 		92FB2D421B3A309900D7774A /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		92FCC0151B2B4B6A00F4BF7E /* MoCocoa.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoCocoa.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -139,6 +140,7 @@
 		92175E8B1B14F3BD007151EA /* Snk */ = {
 			isa = PBXGroup;
 			children = (
+				92FACE12225AFD7C00B9EB06 /* Snk.entitlements */,
 				9294D15A1B38C6BE0030C8D9 /* Sparkle */,
 				92726CFF1B33DDBD00B944FD /* Sounds */,
 				92664BEB1B2CE94100784BC4 /* Images */,
@@ -252,6 +254,11 @@
 						DevelopmentTeam = HFT3T55WND;
 						LastSwiftMigration = 1020;
 						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -455,6 +462,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = HFT3T55WND;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Snk/_sparkle";
 				INFOPLIST_FILE = Snk/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -472,6 +480,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = HFT3T55WND;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Snk/_sparkle";
 				INFOPLIST_FILE = Snk/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
