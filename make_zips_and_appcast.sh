@@ -1,33 +1,37 @@
 #!/bin/sh
 
-# This script builds Snk for distribution.
-# It first builds the app and then creates two
-# ZIP files and a Sparkle appcast XML file which
-# it places on the Desktop. Those files can then
-# all be uploaded to the web.
-
 # Get the bundle version from the plist.
 PLIST_FILE="Snk/Info.plist"
-VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PLIST_FILE)
+VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" $PLIST_FILE)
+SHORT_VERSION_STRING=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PLIST_FILE)
 
 # Set up file names and paths.
-BUILD_PATH=$(mktemp -dt "Snk")
-SPARKLE_ZIP_NAME="Snk-$VERSION.zip"
-SPARKLE_ZIP_PATH1="$HOME/Desktop/$SPARKLE_ZIP_NAME"
-SPARKLE_ZIP_PATH2="$HOME/Desktop/Snk.zip"
-SPARKLE_XML_PATH="$HOME/Desktop/snk.xml"
+SNK_APP_PATH="$HOME/Desktop/Snk.app"
+SPARKLE_ZIP_NAME="Snk-$SHORT_VERSION_STRING.zip"
+OUTPUT_DIR="$HOME/Desktop/Snk-$SHORT_VERSION_STRING"
+SPARKLE_ZIP_PATH1="$OUTPUT_DIR/$SPARKLE_ZIP_NAME"
+SPARKLE_ZIP_PATH2="$OUTPUT_DIR/Snk.zip"
+SPARKLE_XML_PATH="$OUTPUT_DIR/snk.xml"
 
-# Build Snk in a temporary build location.
-xcodebuild -scheme Snk \
-           -configuration Release \
-           -derivedDataPath "$BUILD_PATH" \
-           build
+if [ -d "$SNK_APP_PATH" ]
+then
+	echo "Making zips and appcast..."
+else
+    echo ""
+	echo "$SNK_APP_PATH: NOT FOUND!"
+    echo ""
+    echo "Export notarized Snk.app to Desktop."
+    echo "See BUILD.txt for instructions."
+    echo ""
+    exit 1
+fi
 
-# Compress the app.
-cd "$BUILD_PATH/Build/Products/Release"
-rm -f "$SPARKLE_ZIP_PATH1"
-rm -f "$SPARKLE_ZIP_PATH2"
-zip -r -y "$SPARKLE_ZIP_PATH1" Snk.app
+# Make output dir (if necessary) and clear its contents.
+mkdir -p "$OUTPUT_DIR"
+rm -f "$OUTPUT_DIR/*"
+
+# Compress Snk.app and make a copy without version suffix.
+ditto -c -k --rsrc --keepParent "$SNK_APP_PATH" "$SPARKLE_ZIP_PATH1"
 cp "$SPARKLE_ZIP_PATH1" "$SPARKLE_ZIP_PATH2"
 
 # Get the date and zip file size for the Sparkle XML.
@@ -47,17 +51,22 @@ cat > "$SPARKLE_XML_PATH" <<EOF
 <description>Most recent changes</description>
 <language>en</language>
 <item>
-<title>Version $VERSION</title>
+<title>Version $SHORT_VERSION_STRING</title>
 <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
 <sparkle:releaseNotesLink>https://mowglii.com/snk/changelog.html</sparkle:releaseNotesLink>
 <pubDate>$DATE +0000</pubDate>
 <enclosure
   url="https://s3.amazonaws.com/mowglii/$SPARKLE_ZIP_NAME"
   sparkle:version="$VERSION"
+  sparkle:shortVersionString="$SHORT_VERSION_STRING"
   length="$FILESIZE"
   type="application/octet-stream" />
 </item>
 </channel>
 </rss>
 EOF
+
+echo "Done!"
+
+open -R "$OUTPUT_DIR/snk.xml"
 
