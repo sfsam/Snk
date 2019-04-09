@@ -21,8 +21,9 @@ Keyboard Controls
 
 Choose level    1, 2 or 3
 Move snake      Arrows or WASD
-Game Over       OK = Space
-                Play again = 1, 2 or 3
+Game Over
+  OK            Space
+  Play again    1, 2 or 3
 
 Music Credits
 =============
