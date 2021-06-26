@@ -4,9 +4,6 @@
 
 import Cocoa
 
-// OS X title bars are 22 points tall.
-let kTitlebarHeight: CGFloat = 22
-
 final class MainVC: NSViewController {
     
     // When a child view controller is added, MainVC will apply
@@ -35,14 +32,21 @@ final class MainVC: NSViewController {
     override func loadView() {
         let v = MoView()
         
+        // Calculate the titlebar height of a normal window so we
+        // have this dimension for our custom drawing and layout.
+        
+        let contentRect = NSRect(x: 0, y: 0, width: 200, height: 200)
+        let frameRect = NSWindow.frameRect(forContentRect: contentRect, styleMask: [.titled])
+        let titlebarHeight = frameRect.height - contentRect.height
+
         // Fill background and draw title bar.
         
         v.bgColor = SharedTheme.color(.background)
         v.drawBlock = { (context, bounds) in
             // Title bar gradient.
             var rect = bounds
-            rect.origin.y = bounds.height - kTitlebarHeight
-            rect.size.height = kTitlebarHeight
+            rect.origin.y = bounds.height - titlebarHeight
+            rect.size.height = titlebarHeight
             let c1 = NSColor(white: 1, alpha: 0.8)
             let c2 = NSColor(white: 1, alpha: 0.4)
             NSGradient(starting: c1, ending: c2)?.draw(in: rect, angle: -90)
@@ -70,7 +74,7 @@ final class MainVC: NSViewController {
         
         let contentViewWidth  = CGFloat( (1 + kCols + 1) * kStep ),
             contentViewHeight = CGFloat( (1 + kRows + 1) * kStep )
-        let metrics = ["tb": kTitlebarHeight, "w": contentViewWidth, "h": contentViewHeight]
+        let metrics = ["tb": titlebarHeight, "w": contentViewWidth, "h": contentViewHeight]
         let views = ["contentView": contentView]
         
         v.makeConstraints(metrics: metrics as [String : NSNumber]?, views: views, formatsAndOptions: [
