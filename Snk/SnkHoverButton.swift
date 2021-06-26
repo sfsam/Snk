@@ -7,7 +7,7 @@ import Cocoa
 // SnkHoverButton can notify a delegate that
 // its hover state has changed.
 
-protocol SnkHoverButtonDelegate: class {
+protocol SnkHoverButtonDelegate: AnyObject {
     func hoverChanged(for button: SnkHoverButton)
 }
 
