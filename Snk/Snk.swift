@@ -33,7 +33,7 @@ let kSoundVictory       = "tada.mp3"
 // 1: 8-bit Melody http://www.looperman.com/loops/detail/68575/8-bit-melody-by-kinggjmaytryx-free-156bpm-electro-sh-loop
 // 2: Bibo by https://soundcloud.com/lv-7
 // 3: Flight of the Bumblebee https://www.youtube.com/watch?v=wOFgh2IdnZI
-let kSong1 = "loop.aiff"
+let kSong1 = "loop.mp3"
 let kSong2 = "bibo.mp3"
 let kSong3 = "fotbb.mp3"
 
