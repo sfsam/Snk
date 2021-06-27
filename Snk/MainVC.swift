@@ -6,17 +6,6 @@ import Cocoa
 
 final class MainVC: NSViewController {
     
-    // When a child view controller is added, MainVC will apply
-    // a subtle shadow to the child view controller's view.
-    
-    let shadow: NSShadow = {
-        let sh = NSShadow()
-        sh.shadowBlurRadius = 2 * kScale
-        sh.shadowColor = NSColor(white: 0, alpha: 0.2)
-        sh.shadowOffset = CGSize(width: 0, height: -kScale)
-        return sh
-    }()
-    
     // Child view controller views are subviews of contentView.
     // It sits just below the toolbar drawn by our main view.
     
@@ -93,7 +82,6 @@ final class MainVC: NSViewController {
         let splashVC = SplashVC()
         addChild(splashVC)
         contentView.addSubview(splashVC.view)
-        splashVC.view.shadow = shadow
         splashVC.view.alignFrame(with: contentView)
     }
     
@@ -115,7 +103,6 @@ final class MainVC: NSViewController {
         
         addChild(newVC)
         newVC.view.translatesAutoresizingMaskIntoConstraints = true
-        newVC.view.shadow = shadow
         
         // Animate.
         
