@@ -376,9 +376,9 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
                 SharedAudio.play(sound: kSoundGameOver)
             }
             self.replLayer.opacity = 0.5
-            let ok = SnkHoverButton(imageName: "ok", tint: SharedTheme.color(.logo), scale: 6)
+            let ok = SnkHoverButton(imageName: "ok", tint: SharedTheme.color(.logo), scale: 4)
             ok.dimmedAlpha = 1
-            ok.borderWidth = 6
+            ok.borderWidth = 4
             ok.borderHighlightColor = SharedTheme.color(.wall)
             ok.keyEquivalent = " "
             ok.target = self
