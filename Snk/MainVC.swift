@@ -44,6 +44,11 @@ final class MainVC: NSViewController {
             rect.size.height = 1
             NSColor(white: 1, alpha: 0.5).set()
             rect.fill(using: .sourceOver)
+            // Shadow under title bar.
+            rect.origin.y = bounds.height - titlebarHeight - 2
+            rect.size.height = 2;
+            NSColor(white: 0, alpha: 0.1).set()
+            rect.fill(using: .sourceOver)
         }
 
         v.addSubview(contentView)
