@@ -1,45 +1,54 @@
 #!/bin/sh
 
+# If Snk.app is not found on the Desktop, quit.
+APP_PATH="$HOME/Desktop/Snk.app"
+if [ ! -d "$APP_PATH" ]
+then
+    echo "\n"
+    echo "  + \033[0;31mNOT FOUND:\033[0m $APP_PATH"
+    echo "  + Export notarized Snk.app to Desktop."
+    echo "\n"
+    exit 1
+fi
+
 # Get the bundle version from the plist.
-PLIST_FILE="Snk/Info.plist"
+PLIST_FILE="$APP_PATH/Contents/Info.plist"
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" $PLIST_FILE)
 SHORT_VERSION_STRING=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PLIST_FILE)
 
 # Set up file names and paths.
-SNK_APP_PATH="$HOME/Desktop/Snk.app"
-SPARKLE_ZIP_NAME="Snk-$SHORT_VERSION_STRING.zip"
-OUTPUT_DIR="$HOME/Desktop/Snk-$SHORT_VERSION_STRING"
-SPARKLE_ZIP_PATH1="$OUTPUT_DIR/$SPARKLE_ZIP_NAME"
-SPARKLE_ZIP_PATH2="$OUTPUT_DIR/Snk.zip"
-SPARKLE_XML_PATH="$OUTPUT_DIR/snk.xml"
+ZIP_NAME="Snk-$SHORT_VERSION_STRING.zip"
+ZIP_NAME=${ZIP_NAME// /-}
+DEST_DIR="$HOME/Desktop/Snk-$SHORT_VERSION_STRING"
+XML_PATH="$DEST_DIR/snk.xml"
+ZIP_PATH1="$DEST_DIR/$ZIP_NAME"
+ZIP_PATH2="$DEST_DIR/Snk.zip"
 
-if [ -d "$SNK_APP_PATH" ]
-then
-	echo "Making zips and appcast..."
-else
-    echo ""
-	echo "$SNK_APP_PATH: NOT FOUND!"
-    echo ""
-    echo "Export notarized Snk.app to Desktop."
-    echo "See BUILD.txt for instructions."
-    echo ""
-    exit 1
-fi
+# Run some diagnostics so we can see all is ok."
+echo ""
+( set -x; spctl -vvv --assess --type exec $APP_PATH )
+echo ""
+( set -x; codesign -vvv --deep --strict $APP_PATH )
+echo ""
+( set -x; codesign -dvv $APP_PATH )
+
+echo ""
+echo "Making zips and appcast for \033[0;32m$SHORT_VERSION_STRING ($VERSION)\033[0m..."
 
 # Make output dir (if necessary) and clear its contents.
-mkdir -p "$OUTPUT_DIR"
-rm -f "$OUTPUT_DIR/*"
+rm -frd "$DEST_DIR"
+mkdir -p "$DEST_DIR"
 
 # Compress Snk.app and make a copy without version suffix.
-ditto -c -k --rsrc --keepParent "$SNK_APP_PATH" "$SPARKLE_ZIP_PATH1"
-cp "$SPARKLE_ZIP_PATH1" "$SPARKLE_ZIP_PATH2"
+ditto -c -k --rsrc --keepParent "$APP_PATH" "$ZIP_PATH1"
+cp "$ZIP_PATH1" "$ZIP_PATH2"
 
 # Get the date and zip file size for the Sparkle XML.
 DATE=$(TZ=GMT date)
-FILESIZE=$(stat -f "%z" "$SPARKLE_ZIP_PATH1")
+FILESIZE=$(stat -f "%z" "$ZIP_PATH1")
 
 # Make the Sparkle appcast XML file.
-cat > "$SPARKLE_XML_PATH" <<EOF
+cat > "$XML_PATH" <<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <rss
   version="2.0"
@@ -52,11 +61,11 @@ cat > "$SPARKLE_XML_PATH" <<EOF
 <language>en</language>
 <item>
 <title>Version $SHORT_VERSION_STRING</title>
-<sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+<sparkle:minimumSystemVersion>10.16</sparkle:minimumSystemVersion>
 <sparkle:releaseNotesLink>https://mowglii.com/snk/changelog.html</sparkle:releaseNotesLink>
 <pubDate>$DATE +0000</pubDate>
 <enclosure
-  url="https://s3.amazonaws.com/mowglii/$SPARKLE_ZIP_NAME"
+  url="https://s3.amazonaws.com/mowglii/$ZIP_NAME"
   sparkle:version="$VERSION"
   sparkle:shortVersionString="$SHORT_VERSION_STRING"
   length="$FILESIZE"
@@ -67,6 +76,7 @@ cat > "$SPARKLE_XML_PATH" <<EOF
 EOF
 
 echo "Done!"
+echo ""
 
-open -R "$OUTPUT_DIR/snk.xml"
+open -R "$XML_PATH"
 
