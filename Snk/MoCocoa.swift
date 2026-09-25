@@ -97,29 +97,8 @@ extension NSView {
     }
     
     @discardableResult
-    func alignTopToBottom(of view: NSView, constant: CGFloat = 0) -> NSLayoutConstraint {
-        let constraint = NSLayoutConstraint(item: self, attribute: .top, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: constant)
-        constraint.isActive = true
-        return constraint
-    }
-    
-    @discardableResult
     func alignBottomToTop(of view: NSView, constant: CGFloat = 0) -> NSLayoutConstraint {
         let constraint = NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: -constant)
-        constraint.isActive = true
-        return constraint
-    }
-    
-    @discardableResult
-    func alignLeadingToTrailing(of view: NSView, constant: CGFloat = 0) -> NSLayoutConstraint {
-        let constraint = NSLayoutConstraint(item: self, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: constant)
-        constraint.isActive = true
-        return constraint
-    }
-    
-    @discardableResult
-    func alignTrailingToLeading(of view: NSView, constant: CGFloat = 0) -> NSLayoutConstraint {
-        let constraint = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: -constant)
         constraint.isActive = true
         return constraint
     }
@@ -172,7 +151,7 @@ extension NSView {
 
 extension NSView {
 
-    // Fade receiver in or out. Timing is in seconds.
+    // Fade receiver in. Timing is in seconds.
     // AppKit calls the completion handler on the main thread.
     
     func fadeIn(after delay: TimeInterval, duration: TimeInterval, completionHandler: (@MainActor () -> Void)?) {
@@ -181,18 +160,6 @@ extension NSView {
                 context.duration = duration
                 context.timingFunction = CAMediaTimingFunction(name: .easeOut)
                 self.animator().alphaValue = 1
-            }, completionHandler: {
-                MainActor.assumeIsolated { completionHandler?() }
-            })
-        }
-    }
-    
-    func fadeOut(after delay: TimeInterval, duration: TimeInterval, completionHandler: (@MainActor () -> Void)?) {
-        moDispatch(after: delay) {
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = duration
-                context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-                self.animator().alphaValue = 0
             }, completionHandler: {
                 MainActor.assumeIsolated { completionHandler?() }
             })
