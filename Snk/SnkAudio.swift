@@ -41,8 +41,8 @@ final class SnkAudio: NSObject {
         // properties to the corresponding defaults
         // which the user can change at any time.
         
-        self.bind(NSBindingName(rawValue: "soundsEnabled"), to: NSUserDefaultsController.shared, withKeyPath: "values." + kEnableSoundsKey, options: nil)
-        self.bind(NSBindingName(rawValue: "musicEnabled"), to: NSUserDefaultsController.shared, withKeyPath: "values." + kEnableMusicKey, options: nil)
+        self.bind(NSBindingName("soundsEnabled"), to: NSUserDefaultsController.shared, withKeyPath: "values." + kEnableSoundsKey, options: nil)
+        self.bind(NSBindingName("musicEnabled"), to: NSUserDefaultsController.shared, withKeyPath: "values." + kEnableMusicKey, options: nil)
     }
     
     func loadSounds() {

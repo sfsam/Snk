@@ -71,7 +71,7 @@ final class MainVC: NSViewController {
         let metrics = ["tb": titlebarHeight, "w": contentViewWidth, "h": contentViewHeight]
         let views = ["contentView": contentView]
         
-        v.makeConstraints(metrics: metrics as [String : NSNumber]?, views: views, formatsAndOptions: [
+        v.makeConstraints(metrics: metrics, views: views, formatsAndOptions: [
             ("V:|-tb-[contentView(h)]|", []),
             ("H:|[contentView(w)]|", [])
         ])

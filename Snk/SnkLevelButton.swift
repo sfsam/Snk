@@ -17,7 +17,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
     let scoreLabel = SnkScoreLabel(fgColor: SharedTheme.color(.logo))
     
     init(level: SnkLevel, target: AnyObject?, action: Selector) {
-        super.init(frame: NSZeroRect)
+        super.init(frame: .zero)
         
         // There are 2 parts: the level button and the high
         // score label.
@@ -37,7 +37,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         button.action = action
         button.tag = level.rawValue
         button.keyEquivalent = String(level.rawValue)
-        button.keyEquivalentModifierMask = NSEvent.ModifierFlags(rawValue: 0) // No modifier
+        button.keyEquivalentModifierMask = [] // No modifier
         button.delegate = self
 
         // Button dimensions. Button shows a border.
@@ -60,14 +60,14 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         
         let snakeAnim  = CAKeyframeAnimation(keyPath: "contentsRect")
         snakeAnim.calculationMode = .discrete
-        snakeAnim.repeatCount = Float.infinity
+        snakeAnim.repeatCount = .infinity
         snakeAnim.values = (0...23).map {
             NSValue(rect: NSRect(x: CGFloat($0)/24, y: 0, width: 1/24, height: 1))
         }
         switch level { // anim duration matches level speed
         case .slow:   snakeAnim.duration = 24 * kLevel1SecPerFrame
         case .medium: snakeAnim.duration = 24 * kLevel2SecPerFrame
-        default:      snakeAnim.duration = 24 * kLevel3SecPerFrame
+        case .fast:   snakeAnim.duration = 24 * kLevel3SecPerFrame
         }
         
         // Set up the layer that shows the animated snake.
@@ -78,7 +78,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         // because the alternating orientation looks better.
         
         if level == .medium {
-            snakeLayer.transform = CATransform3DMakeRotation(CGFloat(Double.pi/2), 0, 0, 1)
+            snakeLayer.transform = CATransform3DMakeRotation(.pi / 2, 0, 0, 1)
         }
         
         snakeLayer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
@@ -108,9 +108,9 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         switch level {
         case .slow:   keyPath += kHiScoreSlowKey
         case .medium: keyPath += kHiScoreMediumKey
-        default:      keyPath += kHiScoreFastKey
+        case .fast:   keyPath += kHiScoreFastKey
         }
-        scoreLabel.bind(NSBindingName(rawValue: "score"), to: NSUserDefaultsController.shared, withKeyPath: keyPath, options: nil)
+        scoreLabel.bind(NSBindingName("score"), to: NSUserDefaultsController.shared, withKeyPath: keyPath, options: nil)
         scoreLabel.alphaValue = kScoreDimmedAlpha
 
         // Ok, the score label is done!
@@ -127,10 +127,10 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         self.addSubview(scoreLabel)
         
         let metrics = ["a": 4 * kScale]
-        let views = ["button": button, "score": scoreLabel] as [String : Any]
+        let views = ["button": button, "score": scoreLabel]
         
-        self.makeConstraints(metrics: metrics as [String : NSNumber], views: views, formatsAndOptions: [
-            ("V:|[button]-a-[score]|", NSLayoutConstraint.FormatOptions.alignAllCenterX),
+        self.makeConstraints(metrics: metrics, views: views, formatsAndOptions: [
+            ("V:|[button]-a-[score]|", .alignAllCenterX),
             ("H:|[button]|", [])
         ])
     }

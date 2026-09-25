@@ -8,12 +8,8 @@ import Cocoa
 // on a kCols x kRows grid. SnkPoint conforms
 // to Equatable so we can do collision testing.
 
-struct SnkPoint {
+struct SnkPoint: Equatable {
     var x = 0, y = 0
-}
-extension SnkPoint: Equatable {}
-func ==(lhs: SnkPoint, rhs: SnkPoint) -> Bool {
-    return lhs.x == rhs.x && lhs.y == rhs.y
 }
 
 final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
@@ -83,7 +79,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         }
     }
     
-    init!(level: SnkLevel) {
+    init(level: SnkLevel) {
         self.level = level
         super.init(nibName: nil, bundle: nil)
     }
@@ -350,12 +346,12 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             SharedAudio.play(sound: kSoundCrash)
             
             let anim = CAKeyframeAnimation(keyPath: "position")
-            let delta = UInt32(12 * kScale)
+            let delta = Int(12 * kScale)
             anim.duration = 0.3
             anim.calculationMode = .discrete
             anim.values = (1...20).map { _ in
-                let x = self.view.layer!.position.x + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
-                let y = self.view.layer!.position.y + CGFloat(arc4random_uniform(delta)) - CGFloat(delta/2)
+                let x = self.view.layer!.position.x + CGFloat(Int.random(in: 0..<delta) - delta/2)
+                let y = self.view.layer!.position.y + CGFloat(Int.random(in: 0..<delta) - delta/2)
                 return NSValue(point: CGPoint(x: x, y: y))
             }
             view.layer!.add(anim, forKey: "rattle")
@@ -399,9 +395,9 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
                         moDispatch(after: TimeInterval(index) * 0.1) {
                             let animPath = CGMutablePath()
                             animPath.move(to: segment.position)
-                            let midX = NSMidX(self.snakeLayer.frame)
+                            let midX = self.snakeLayer.frame.midX
                             let deltaX = 2 * (segment.position.x - midX)
-                            let deltaY = CGFloat(arc4random_uniform(UInt32(15 * kStep)))
+                            let deltaY = CGFloat(Int.random(in: 0..<15 * kStep))
                             let endPt  = CGPoint(x: segment.position.x + deltaX, y: segment.position.y - boardHeight)
                             let ctrlPt = CGPoint(x: segment.position.x + deltaX/2, y: segment.position.y + deltaY)
                             animPath.addCurve(to: endPt, control1: ctrlPt, control2: ctrlPt)
@@ -451,14 +447,14 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         SharedAudio.stopEverything()
         SharedAudio.play(sound: kSoundOk)
         let mainVC = self.parent as! MainVC
-        mainVC.transition(to: MenuVC(), options: NSViewController.TransitionOptions.slideRight)
+        mainVC.transition(to: MenuVC(), options: .slideRight)
     }
     
     private func play(level: SnkLevel) {
         guard state == .gameOver else { return }
         SharedAudio.stopEverything()
         let mainVC = self.parent as! MainVC
-        mainVC.transition(to: GameVC(level: level), options: NSViewController.TransitionOptions.slideLeft)
+        mainVC.transition(to: GameVC(level: level), options: .slideLeft)
         SharedAudio.play(sound: kSoundStartGame)
     }
     
@@ -510,7 +506,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         
         let anim = CAKeyframeAnimation(keyPath: "bounds.size")
         anim.duration = 0.25
-        anim.repeatCount = Float.infinity
+        anim.repeatCount = .infinity
         anim.autoreverses = true
         anim.calculationMode = .discrete
         // stride by 2 ensures sides are even and fall on pixel boundaries (not blurry)
@@ -626,11 +622,11 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             wallsEnabled = false
             let spinAnim = CAKeyframeAnimation(keyPath: "transform")
             spinAnim.values = (0...4).map {
-                let angle = CGFloat($0) * CGFloat(-Double.pi/2)
+                let angle = CGFloat($0) * -.pi / 2
                 return NSValue(caTransform3D: CATransform3DRotate(self.replLayer.transform, angle, 0, 0, 1))
             }
             spinAnim.duration = 25
-            spinAnim.repeatCount = Float.infinity
+            spinAnim.repeatCount = .infinity
             replLayer.add(spinAnim, forKey: "spin")
             SharedAudio.play(sound: kSoundSpinBoard)
         }
@@ -641,19 +637,19 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             
             CATransaction.begin()
             CATransaction.setAnimationDuration(0.3)
-            replLayer.transform = CATransform3DRotate(replLayer.transform, -15 * CGFloat(Double.pi/180), 0, 0, 1)
+            replLayer.transform = CATransform3DRotate(replLayer.transform, -15 * .pi / 180, 0, 0, 1)
             CATransaction.commit()
             SharedAudio.play(sound: kSoundRotateBoard)
         }
         
-        else if scoreLabel.score > kScore3D && CATransform3DEqualToTransform(replLayer.transform, CATransform3DIdentity) {
+        else if scoreLabel.score > kScore3D && CATransform3DIsIdentity(replLayer.transform) {
             
             // Transform to 3D.
             
             var t = CATransform3DIdentity
             t.m34 = -1/400
             t = CATransform3DTranslate(t, 0, 10, -75);
-            t = CATransform3DRotate(t, -30 * CGFloat(Double.pi)/180, 1, 0, 0.2)
+            t = CATransform3DRotate(t, -30 * .pi / 180, 1, 0, 0.2)
             CATransaction.begin()
             CATransaction.setAnimationDuration(1)
             replLayer.transform = t

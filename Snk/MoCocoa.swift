@@ -11,8 +11,7 @@ import Cocoa
 // Dispatch `work` on the main queue after `delay` seconds.
 
 func moDispatch(after delay: TimeInterval, execute work: @escaping () -> Void) {
-    let milliseconds = Int(delay * 1000)
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds), execute: work)
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
 }
 
 // MARK: - NSView Auto Layout
@@ -145,16 +144,17 @@ extension NSView {
     //
     // Example:
     //
-    // let metrics = ["m1": metric1, "m2", metric2]
+    // let metrics: [String: CGFloat] = ["m1": metric1, "m2": metric2]
     // let views = ["v1": view1, "v2": view2]
     //
     // view.makeConstraints(metrics: metrics, views: views, formatsAndOptions: [
-    //     ("H:|-m1-[v1]-[v2]-m2-|", .AlignAllCenterY),
+    //     ("H:|-m1-[v1]-[v2]-m2-|", .alignAllCenterY),
     //     ("V:|-m1-[v1]", [])
     // ])
     
     @discardableResult
-    func makeConstraints(metrics: [String: NSNumber]?, views: [String: Any], formatsAndOptions: [(format: String, options: NSLayoutConstraint.FormatOptions)]) -> [NSLayoutConstraint] {
+    func makeConstraints(metrics: [String: CGFloat]?, views: [String: NSView], formatsAndOptions: [(format: String, options: NSLayoutConstraint.FormatOptions)]) -> [NSLayoutConstraint] {
+        let metrics = metrics?.mapValues { $0 as NSNumber }
         var constraints = [NSLayoutConstraint]()
         for (format, options) in formatsAndOptions {
             constraints += NSLayoutConstraint.constraints(withVisualFormat: format, options: options, metrics: metrics, views: views)
@@ -216,7 +216,7 @@ extension NSImage {
         return NSImage(size: self.size, flipped: false, drawingHandler: { rect -> Bool in
             let context = NSGraphicsContext.current?.cgContext
             context?.interpolationQuality = .none
-            self.draw(in: NSRect(origin: CGPoint.zero, size: self.size))
+            self.draw(in: NSRect(origin: .zero, size: self.size))
             context?.setFillColor(color.cgColor)
             context?.setBlendMode(.sourceAtop)
             context?.fill(rect)

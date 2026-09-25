@@ -56,7 +56,7 @@ final class SnkScoreLabel: MoView {
         self.digitsFg = NSImage(named: "digitsfg")?.tint(color: fgColor)
         self.digitsBg = NSImage(named: "digitsbg")?.tint(color: bgColor)
         
-        super.init(frame: NSZeroRect)
+        super.init(frame: .zero)
         
         // Capture self as unowned to avoid a retain cycle:
         // self owns drawBlock, which only runs while drawing self.

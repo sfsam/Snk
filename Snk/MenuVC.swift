@@ -18,9 +18,9 @@ final class MenuVC: NSViewController {
         
         let logo = SnkImageView(named: "snk", tint: SharedTheme.color(.logo), scale: 7)
 
-        let button1 = SnkLevelButton(level: .slow,   target: self, action: #selector(MenuVC.activate(button:)))
-        let button2 = SnkLevelButton(level: .medium, target: self, action: #selector(MenuVC.activate(button:)))
-        let button3 = SnkLevelButton(level: .fast,   target: self, action: #selector(MenuVC.activate(button:)))
+        let button1 = SnkLevelButton(level: .slow,   target: self, action: #selector(activate(button:)))
+        let button2 = SnkLevelButton(level: .medium, target: self, action: #selector(activate(button:)))
+        let button3 = SnkLevelButton(level: .fast,   target: self, action: #selector(activate(button:)))
         
         // Layout logo and level buttons.
         //
@@ -39,12 +39,12 @@ final class MenuVC: NSViewController {
         
         logo.centerX(with: view)
 
-        let metrics = ["a": Int(24 * kScale), "b": kStep]
+        let metrics = ["a": 24 * kScale, "b": CGFloat(kStep)]
         let views = ["logo": logo, "button1": button1, "button2": button2, "button3": button3]
         
-        view.makeConstraints(metrics: metrics as [String : NSNumber]?, views: views, formatsAndOptions: [
-            ("V:|-a-[logo]-b-[button2]", NSLayoutConstraint.FormatOptions.alignAllCenterX),
-            ("H:[button1]-b-[button2]-b-[button3]", NSLayoutConstraint.FormatOptions.alignAllCenterY)
+        view.makeConstraints(metrics: metrics, views: views, formatsAndOptions: [
+            ("V:|-a-[logo]-b-[button2]", .alignAllCenterX),
+            ("H:[button1]-b-[button2]-b-[button3]", .alignAllCenterY)
         ])
     }
     
@@ -57,7 +57,7 @@ final class MenuVC: NSViewController {
         // The min/max dance guarantees rawValue = 1 or 2 or 3 only
         let level  = SnkLevel(rawValue: min(max(button.tag, 1), 3))!
         let mainVC = self.parent as! MainVC
-        mainVC.transition(to: GameVC(level: level), options: NSViewController.TransitionOptions.slideLeft)
+        mainVC.transition(to: GameVC(level: level), options: .slideLeft)
         SharedAudio.play(sound: kSoundStartGame)
     }
 }

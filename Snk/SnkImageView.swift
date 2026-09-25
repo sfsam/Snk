@@ -21,7 +21,7 @@ class SnkImageView: MoView {
     init(image: NSImage?, scale: CGFloat = 1) {
         // If `image` is nil, return an empty view
         guard let image = image else {
-            super.init(frame: NSZeroRect)
+            super.init(frame: .zero)
             return
         }
         let width  = scale * image.size.width * kScale
