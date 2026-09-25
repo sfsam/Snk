@@ -41,6 +41,13 @@ class SnkHoverButton: NSButton {
         self.isBordered = false
         self.bezelStyle = .regularSquare
         self.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Track the mouse entering and exiting the button.
+        // Because of .inVisibleRect, AppKit keeps the tracking
+        // rect in sync with the button's visible area, so the
+        // tracking area never needs to be replaced.
+        
+        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag], owner: self, userInfo: nil))
     }
     
     convenience init(imageName: String, tint: NSColor?, scale: CGFloat) {
@@ -52,14 +59,6 @@ class SnkHoverButton: NSButton {
     
     override var wantsUpdateLayer: Bool {
         return true
-    }
-    
-    override func updateTrackingAreas() {
-        for trackingArea in self.trackingAreas {
-            removeTrackingArea(trackingArea as NSTrackingArea)
-        }
-        let ta = NSTrackingArea(rect: NSZeroRect, options: ([NSTrackingArea.Options.mouseEnteredAndExited, NSTrackingArea.Options.activeAlways, NSTrackingArea.Options.inVisibleRect, NSTrackingArea.Options.enabledDuringMouseDrag]), owner: self, userInfo: nil)
-        addTrackingArea(ta)
     }
     
     override func mouseEntered(with theEvent: NSEvent) {
