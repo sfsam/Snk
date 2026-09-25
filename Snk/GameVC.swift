@@ -532,8 +532,8 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         let xMax = wallsEnabled ? kCols-2 : kCols-1
         let yMax = wallsEnabled ? kRows-2 : kRows-1
         
-        var x = Int(arc4random_uniform( UInt32(xMax) )) + xMin
-        var y = Int(arc4random_uniform( UInt32(yMax) )) + yMin
+        var x = Int.random(in: xMin...xMax)
+        var y = Int.random(in: yMin...yMax)
         
         // Next, make sure the random location isn't on
         // on the snake. If it is, choose the next
