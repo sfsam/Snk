@@ -204,15 +204,17 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     // MARK: - Input
     
     override func keyDown(with theEvent: NSEvent) {
-        func key(_ x: Int) -> String {
-            return UnicodeScalar(x)!.escaped(asASCII: false)
-        }
-        if let chars = theEvent.charactersIgnoringModifiers {
-            switch chars {
-            case "w", "W", key(NSEvent.SpecialKey.upArrow.rawValue):    addDirection(.up)
-            case "s", "S", key(NSEvent.SpecialKey.downArrow.rawValue):  addDirection(.down)
-            case "a", "A", key(NSEvent.SpecialKey.leftArrow.rawValue):  addDirection(.left)
-            case "d", "D", key(NSEvent.SpecialKey.rightArrow.rawValue): addDirection(.right)
+        switch theEvent.specialKey {
+        case .upArrow:    addDirection(.up)
+        case .downArrow:  addDirection(.down)
+        case .leftArrow:  addDirection(.left)
+        case .rightArrow: addDirection(.right)
+        default:
+            switch theEvent.charactersIgnoringModifiers {
+            case "w", "W": addDirection(.up)
+            case "s", "S": addDirection(.down)
+            case "a", "A": addDirection(.left)
+            case "d", "D": addDirection(.right)
             case "p", "P", " ":
                 if state == .playing || state == .paused {
                     state = state == .playing ? .paused : .playing
@@ -222,9 +224,6 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             case "3": play(level: .fast)
             default: super.keyDown(with: theEvent)
             }
-        }
-        else {
-            super.keyDown(with: theEvent)
         }
     }
     
