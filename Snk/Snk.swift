@@ -62,6 +62,9 @@ enum SnkLevel: Int {
 
 let kMaxScoreIncrement = 55
 
+// Max directional keypresses buffered between frames
+let kMaxBufferedDirections = 2
+
 // Seconds per frame
 let kLevel1SecPerFrame = 0.140
 let kLevel2SecPerFrame = 0.085

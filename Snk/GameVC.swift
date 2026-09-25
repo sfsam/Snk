@@ -209,10 +209,13 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         // Only do so when state == .Playing.
         // Consecutive directions can't be the same or
         // opposite (Snake going .Up can only go .Left
-        // or .Right next, not .Down).
+        // or .Right next, not .Down). Ignore keypresses
+        // once the buffer is full so that mashing keys
+        // doesn't queue up moves for many frames.
         
         let oldDir = directionBuffer.count > 0 ? directionBuffer.last : direction
         if  state  != .playing ||
+            directionBuffer.count >= kMaxBufferedDirections ||
             newDir == oldDir ||
             newDir == .up    && oldDir == .down ||
             newDir == .down  && oldDir == .up   ||
