@@ -58,7 +58,10 @@ final class SnkScoreLabel: MoView {
         
         super.init(frame: NSZeroRect)
         
-        self.drawBlock = { (context, bounds) in
+        // Capture self as unowned to avoid a retain cycle:
+        // self owns drawBlock, which only runs while drawing self.
+        
+        self.drawBlock = { [unowned self] (context, bounds) in
             
             if self.score == 0 { return }
             
