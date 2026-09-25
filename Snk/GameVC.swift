@@ -138,6 +138,12 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         
         setupFood()
         startTimer()
+        
+        // Pause when the window loses focus (the user switches
+        // apps, minimizes the window, or opens an alert) so the
+        // snake doesn't crash while the user isn't looking.
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(windowDidResignKey(_:)), name: NSWindow.didResignKeyNotification, object: nil)
     }
     
     override func viewDidAppear() {
@@ -149,6 +155,13 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
 
         view.window!.makeFirstResponder(self)
         
+        // viewDidAppear() is called again when the window is
+        // restored after being minimized. Only start the game
+        // the first time so we don't unpause the game or
+        // restart the music after the game is over.
+        
+        guard state == .initializing else { return }
+        
         switch level {
         case .slow:   SharedAudio.play(music: kSong1, loop: true)
         case .medium: SharedAudio.play(music: kSong2, loop: true)
@@ -156,6 +169,12 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         }
         
         state = .playing
+    }
+    
+    @objc func windowDidResignKey(_ notification: Notification) {
+        if state == .playing && notification.object as? NSWindow === view.window {
+            state = .paused
+        }
     }
     
     // MARK: - Input
@@ -170,7 +189,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             case "s", "S", key(NSEvent.SpecialKey.downArrow.rawValue):  addDirection(.down)
             case "a", "A", key(NSEvent.SpecialKey.leftArrow.rawValue):  addDirection(.left)
             case "d", "D", key(NSEvent.SpecialKey.rightArrow.rawValue): addDirection(.right)
-            case "P":
+            case "p", "P":
                 if state == .playing || state == .paused {
                     state = state == .playing ? .paused : .playing
                 }
