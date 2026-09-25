@@ -57,14 +57,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        UserDefaults.standard.register(defaults: [
-            kHiScoreSlowKey:   0,
-            kHiScoreMediumKey: 0,
-            kHiScoreFastKey:   0,
+        var defaults: [String: Any] = [
             kEnableSoundsKey:  true,
             kEnableMusicKey:   true,
             kBigBoardKey:      false,
-        ])
+        ]
+        for level in SnkLevel.allCases {
+            defaults[level.hiScoreKey] = 0
+        }
+        UserDefaults.standard.register(defaults: defaults)
         setupThemesMenu()
         showMainWindow()
     }
@@ -101,9 +102,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.addButton(withTitle: NSLocalizedString("No", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Yes", comment: ""))
         if alert.runModal() == .alertSecondButtonReturn {
-            UserDefaults.standard.set(0, forKey: kHiScoreSlowKey)
-            UserDefaults.standard.set(0, forKey: kHiScoreMediumKey)
-            UserDefaults.standard.set(0, forKey: kHiScoreFastKey)
+            for level in SnkLevel.allCases {
+                UserDefaults.standard.set(0, forKey: level.hiScoreKey)
+            }
         }
     }
     

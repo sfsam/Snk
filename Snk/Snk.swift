@@ -5,10 +5,8 @@
 import Cocoa
 
 // MARK: NSUserDefaults keys
+// (High score keys are per level. See SnkLevel.)
 
-let kHiScoreSlowKey   = "HiScoreSlow"
-let kHiScoreMediumKey = "HiScoreMedium"
-let kHiScoreFastKey   = "HiScoreFast"
 let kEnableSoundsKey  = "EnableSounds"
 let kEnableMusicKey   = "EnableMusic"
 let kBigBoardKey      = "BigBoard"
@@ -27,15 +25,6 @@ let kSoundCrash         = "explosion.mp3"
 let kSoundGameOver      = "gameover.mp3"
 let kSoundOk            = "woosh.mp3"
 let kSoundVictory       = "tada.mp3"
-
-// MARK: - Music
-
-// 1: 8-bit Melody http://www.looperman.com/loops/detail/68575/8-bit-melody-by-kinggjmaytryx-free-156bpm-electro-sh-loop
-// 2: Bibo by https://soundcloud.com/lv-7
-// 3: Flight of the Bumblebee https://www.youtube.com/watch?v=wOFgh2IdnZI
-let kSong1 = "loop.mp3"
-let kSong2 = "bibo.mp3"
-let kSong3 = "fotbb.mp3"
 
 // MARK: - Dimensions
 
@@ -57,19 +46,46 @@ let kBaseStep = 12
 
 // MARK: - Game settings
 
-enum SnkLevel: Int {
+// Each level has its own speed, high score and music.
+
+enum SnkLevel: Int, CaseIterable {
     case slow = 1, medium, fast
+    
+    // Seconds per frame
+    var secondsPerFrame: TimeInterval {
+        switch self {
+        case .slow:   0.140
+        case .medium: 0.085
+        case .fast:   0.045
+        }
+    }
+    
+    // NSUserDefaults key for the level's high score
+    var hiScoreKey: String {
+        switch self {
+        case .slow:   "HiScoreSlow"
+        case .medium: "HiScoreMedium"
+        case .fast:   "HiScoreFast"
+        }
+    }
+    
+    // Music
+    // 1: 8-bit Melody http://www.looperman.com/loops/detail/68575/8-bit-melody-by-kinggjmaytryx-free-156bpm-electro-sh-loop
+    // 2: Bibo by https://soundcloud.com/lv-7
+    // 3: Flight of the Bumblebee https://www.youtube.com/watch?v=wOFgh2IdnZI
+    var song: String {
+        switch self {
+        case .slow:   "loop.mp3"
+        case .medium: "bibo.mp3"
+        case .fast:   "fotbb.mp3"
+        }
+    }
 }
 
 let kMaxScoreIncrement = 55
 
 // Max directional keypresses buffered between frames
 let kMaxBufferedDirections = 2
-
-// Seconds per frame
-let kLevel1SecPerFrame = 0.140
-let kLevel2SecPerFrame = 0.085
-let kLevel3SecPerFrame = 0.045
 
 // Scores which trigger the board to animate
 let kScoreSpin   = 800

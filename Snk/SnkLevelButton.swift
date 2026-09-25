@@ -64,11 +64,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         snakeAnim.values = (0...23).map {
             NSValue(rect: NSRect(x: CGFloat($0)/24, y: 0, width: 1/24, height: 1))
         }
-        switch level { // anim duration matches level speed
-        case .slow:   snakeAnim.duration = 24 * kLevel1SecPerFrame
-        case .medium: snakeAnim.duration = 24 * kLevel2SecPerFrame
-        case .fast:   snakeAnim.duration = 24 * kLevel3SecPerFrame
-        }
+        snakeAnim.duration = 24 * level.secondsPerFrame // anim duration matches level speed
         
         // Set up the layer that shows the animated snake.
         
@@ -104,12 +100,7 @@ final class SnkLevelButton: MoView, SnkHoverButtonDelegate {
         // Set up the score label. Bind its score property to
         // the hi score stored in NSUserDefaults for `level`.
         
-        var keyPath = "values."
-        switch level {
-        case .slow:   keyPath += kHiScoreSlowKey
-        case .medium: keyPath += kHiScoreMediumKey
-        case .fast:   keyPath += kHiScoreFastKey
-        }
+        let keyPath = "values." + level.hiScoreKey
         scoreLabel.bind(NSBindingName("score"), to: NSUserDefaultsController.shared, withKeyPath: keyPath, options: nil)
         scoreLabel.alphaValue = kScoreDimmedAlpha
 

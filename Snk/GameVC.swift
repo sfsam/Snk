@@ -203,11 +203,7 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
         
         guard state == .initializing else { return }
         
-        switch level {
-        case .slow:   SharedAudio.play(music: kSong1, loop: true)
-        case .medium: SharedAudio.play(music: kSong2, loop: true)
-        case .fast:   SharedAudio.play(music: kSong3, loop: true)
-        }
+        SharedAudio.play(music: level.song, loop: true)
         
         state = .playing
     }
@@ -493,12 +489,7 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
         scoreIncrement = kMaxScoreIncrement
 
         let defaults = UserDefaults.standard
-        let key: String
-        switch level {
-        case .slow:   key = kHiScoreSlowKey
-        case .medium: key = kHiScoreMediumKey
-        case .fast:   key = kHiScoreFastKey
-        }
+        let key = level.hiScoreKey
         if scoreLabel.score > defaults.integer(forKey: key) {
             defaults.set(scoreLabel.score, forKey: key)
         }
@@ -676,12 +667,7 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
     // MARK: - Timer
     
     func startTimer() {
-        let secondsPerFrame: TimeInterval
-        switch level {
-        case .slow:   secondsPerFrame = kLevel1SecPerFrame
-        case .medium: secondsPerFrame = kLevel2SecPerFrame
-        case .fast:   secondsPerFrame = kLevel3SecPerFrame
-        }
+        let secondsPerFrame = level.secondsPerFrame
         let timer = DispatchSource.makeTimerSource(queue: .main)
         timer.schedule(deadline: .now() + secondsPerFrame, repeating: secondsPerFrame)
         timer.setEventHandler { [weak self] in
