@@ -203,7 +203,7 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
         
         guard state == .initializing else { return }
         
-        SharedAudio.play(music: level.song, loop: true)
+        SharedAudio.play(music: level.song)
         
         state = .playing
     }

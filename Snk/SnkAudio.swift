@@ -22,18 +22,13 @@ final class SnkAudio: NSObject {
     @objc var soundsEnabled = true
     @objc var musicEnabled: Bool = true {
         didSet {
-            guard let music = music else { return }
-            music.volume = musicEnabled ? musicVolume : 0
+            music?.volume = musicEnabled ? 1 : 0
         }
     }
     
     // Currently playing sound or music.
     var sound: NSSound? = nil
     var music: NSSound? = nil
-    
-    // Need to remember music volume in case we
-    // disable and then re-enable music.
-    var musicVolume: Float = 1
     
     override init() {
         super.init()
@@ -67,19 +62,19 @@ final class SnkAudio: NSObject {
         sound.play()
     }
     
-    func play(music filePath: String, volume: Float = 1, loop: Bool = false) {
+    // Music always loops.
+    
+    func play(music filePath: String) {
         stopMusic()
         music = NSSound(named: filePath)
         guard let music = music else { return }
-        music.volume = musicEnabled ? volume : 0
-        music.loops = loop
+        music.volume = musicEnabled ? 1 : 0
+        music.loops = true
         music.play()
-        musicVolume = volume
     }
     
     func stopMusic() {
-        guard let music = music else { return }
-        music.stop()
+        music?.stop()
     }
     
     func pauseMusic() {
