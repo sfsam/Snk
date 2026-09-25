@@ -1,5 +1,16 @@
 #!/bin/sh
 
+# Stop at the first command that fails.
+set -e
+
+# Print an error and quit.
+fail() {
+    echo ""
+    echo "  + \033[0;31mERROR:\033[0m $1"
+    echo ""
+    exit 1
+}
+
 # If Snk.app is not found on the Desktop, quit.
 APP_PATH="$HOME/Desktop/Snk.app"
 if [ ! -d "$APP_PATH" ]
@@ -13,8 +24,8 @@ fi
 
 # Get the bundle version from the plist.
 PLIST_FILE="$APP_PATH/Contents/Info.plist"
-VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" $PLIST_FILE)
-SHORT_VERSION_STRING=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PLIST_FILE)
+VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$PLIST_FILE")
+SHORT_VERSION_STRING=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$PLIST_FILE")
 
 # Set up file names and paths.
 ZIP_NAME="Snk-$SHORT_VERSION_STRING.zip"
@@ -24,13 +35,14 @@ XML_PATH="$DEST_DIR/snk.xml"
 ZIP_PATH1="$DEST_DIR/$ZIP_NAME"
 ZIP_PATH2="$DEST_DIR/Snk.zip"
 
-# Run some diagnostics so we can see all is ok."
+# Run some diagnostics so we can see all is ok.
+# Quit if the app isn't notarized or properly signed.
 echo ""
-( set -x; spctl -vvv --assess --type exec $APP_PATH )
+( set -x; spctl -vvv --assess --type exec "$APP_PATH" ) || fail "Gatekeeper rejected $APP_PATH. Is it notarized?"
 echo ""
-( set -x; codesign -vvv --deep --strict $APP_PATH )
+( set -x; codesign -vvv --deep --strict "$APP_PATH" ) || fail "Code signature check failed for $APP_PATH."
 echo ""
-( set -x; codesign -dvv $APP_PATH )
+( set -x; codesign -dvv "$APP_PATH" )
 
 echo ""
 echo "Making zips and appcast for \033[0;32m$SHORT_VERSION_STRING ($VERSION)\033[0m..."
@@ -43,8 +55,9 @@ mkdir -p "$DEST_DIR"
 ditto -c -k --rsrc --keepParent "$APP_PATH" "$ZIP_PATH1"
 cp "$ZIP_PATH1" "$ZIP_PATH2"
 
-# Get the date and zip file size for the Sparkle XML.
-DATE=$(TZ=GMT date)
+# Get the date (RFC 822, as RSS requires) and zip
+# file size for the Sparkle XML.
+DATE=$(LC_ALL=C TZ=GMT date "+%a, %d %b %Y %H:%M:%S +0000")
 FILESIZE=$(stat -f "%z" "$ZIP_PATH1")
 
 # Make the Sparkle appcast XML file.
@@ -63,7 +76,7 @@ cat > "$XML_PATH" <<EOF
 <title>Version $SHORT_VERSION_STRING</title>
 <sparkle:minimumSystemVersion>10.16</sparkle:minimumSystemVersion>
 <sparkle:releaseNotesLink>https://mowglii.com/snk/changelog.html</sparkle:releaseNotesLink>
-<pubDate>$DATE +0000</pubDate>
+<pubDate>$DATE</pubDate>
 <enclosure
   url="https://s3.amazonaws.com/mowglii/$ZIP_NAME"
   sparkle:version="$VERSION"
