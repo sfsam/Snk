@@ -56,10 +56,30 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     
     var wallsEnabled = true
     
+    // Shown centered over the dimmed board while paused.
+    
+    let pausedView = SnkImageView(named: "paused", tint: SharedTheme.color(.logo), scale: 3)
+    
     var state: SnkState = .initializing {
         didSet {
             // Hide the cursor when state == .Playing
             NSCursor.setHiddenUntilMouseMoves(state == .playing)
+            
+            // When pausing or unpausing, dim or undim the
+            // board, show or hide the paused view, and pause
+            // or resume the music.
+            
+            if state == .paused || oldValue == .paused {
+                let paused = state == .paused
+                replLayer.opacity = paused ? 0.5 : 1
+                pausedView.isHidden = !paused
+                if paused {
+                    SharedAudio.pauseMusic()
+                }
+                else {
+                    SharedAudio.resumeMusic()
+                }
+            }
         }
     }
     
@@ -123,6 +143,14 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         v.addSubview(scoreLabel)
         scoreLabel.alignTrailing(with: v, constant: CGFloat(kStep) + 10 * kScale)
         scoreLabel.alignBottomToTop(of: v, constant: CGFloat(-kStep) - 12 * kScale)
+        
+        // The paused view is centered in the view and hidden
+        // until the game is paused.
+        
+        v.addSubview(pausedView)
+        pausedView.centerX(with: v)
+        pausedView.centerY(with: v)
+        pausedView.isHidden = true
         
         view = v
     }
@@ -189,7 +217,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             case "s", "S", key(NSEvent.SpecialKey.downArrow.rawValue):  addDirection(.down)
             case "a", "A", key(NSEvent.SpecialKey.leftArrow.rawValue):  addDirection(.left)
             case "d", "D", key(NSEvent.SpecialKey.rightArrow.rawValue): addDirection(.right)
-            case "p", "P":
+            case "p", "P", " ":
                 if state == .playing || state == .paused {
                     state = state == .playing ? .paused : .playing
                 }

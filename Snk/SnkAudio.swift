@@ -81,6 +81,14 @@ final class SnkAudio: NSObject {
         music.stop()
     }
     
+    func pauseMusic() {
+        music?.pause()
+    }
+    
+    func resumeMusic() {
+        music?.resume()
+    }
+    
     func stopEverything() {
         sound?.stop()
         stopMusic()
