@@ -249,8 +249,13 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             advanceScore()
             snakePoints.append(newHeadPoint)
             explodeFood()
-            // Did we win? Check if the snake covers the board.
-            if snakePoints.count >= kCols * kRows {
+            // Did we win? Check if the snake covers the playable
+            // area. With walls enabled, that's the board inside
+            // the walls. Otherwise, it's the entire board.
+            // placeFood() relies on this check to guarantee
+            // that there is an empty cell for the food.
+            let playableCells = wallsEnabled ? (kCols-2) * (kRows-2) : kCols * kRows
+            if snakePoints.count >= playableCells {
                 state = .victorious
             }
             else {
