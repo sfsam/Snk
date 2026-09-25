@@ -297,10 +297,8 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
         case .right: newHeadPoint.x += 1
         }
         if wallsEnabled == false {
-            newHeadPoint.y = newHeadPoint.y > kRows-1 ? 0 : newHeadPoint.y
-            newHeadPoint.y = newHeadPoint.y < 0 ? kRows-1 : newHeadPoint.y
-            newHeadPoint.x = newHeadPoint.x > kCols-1 ? 0 : newHeadPoint.x
-            newHeadPoint.x = newHeadPoint.x < 0 ? kCols-1 : newHeadPoint.x
+            newHeadPoint.x = (newHeadPoint.x + kCols) % kCols
+            newHeadPoint.y = (newHeadPoint.y + kRows) % kRows
         }
         
         // The snake got the food.
