@@ -50,7 +50,7 @@ final class SnkAudio: NSObject {
         // sounds so we can play them instantly later.
         
         for filePath in [kSoundStartup, kSoundHover, kSoundStartGame, kSoundFoodExplosion, kSoundAnimateTo3D, kSoundRotateBoard, kSoundSpinBoard, kSoundCrash, kSoundGameOver, kSoundOk, kSoundVictory] {
-            sounds[filePath] = NSSound(named: filePath)!
+            sounds[filePath] = NSSound(named: filePath)
         }
     }
     

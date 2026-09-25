@@ -184,11 +184,13 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     override func viewDidAppear() {
         super.viewDidAppear()
         
+        guard let window = view.window else { return }
+        
         // Since we own the snakeLayer, we have responsibility
         // for setting its contentScale.
-        snakeLayer.contentsScale = self.view.window!.backingScaleFactor
+        snakeLayer.contentsScale = window.backingScaleFactor
 
-        view.window!.makeFirstResponder(self)
+        window.makeFirstResponder(self)
         
         // viewDidAppear() is called again when the window is
         // restored after being minimized. Only start the game
@@ -356,15 +358,16 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
             SharedAudio.play(sound: kSoundCrash)
             
             let anim = CAKeyframeAnimation(keyPath: "position")
+            let center = view.layer?.position ?? .zero
             let delta = Int(12 * kScale)
             anim.duration = 0.3
             anim.calculationMode = .discrete
             anim.values = (1...20).map { _ in
-                let x = self.view.layer!.position.x + CGFloat(Int.random(in: 0..<delta) - delta/2)
-                let y = self.view.layer!.position.y + CGFloat(Int.random(in: 0..<delta) - delta/2)
+                let x = center.x + CGFloat(Int.random(in: 0..<delta) - delta/2)
+                let y = center.y + CGFloat(Int.random(in: 0..<delta) - delta/2)
                 return NSValue(point: CGPoint(x: x, y: y))
             }
-            view.layer!.add(anim, forKey: "rattle")
+            view.layer?.add(anim, forKey: "rattle")
         }
         else { // reasonForGameOver == .victorious
             // We won! Remove the food layer, revert the board to the inital
@@ -454,16 +457,15 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         // User pressed the OK button after a game.
         // Go back to the main menu.
         
+        guard let mainVC = parent as? MainVC else { return }
         SharedAudio.stopEverything()
         SharedAudio.play(sound: kSoundOk)
-        let mainVC = self.parent as! MainVC
         mainVC.transition(to: MenuVC(), options: .slideRight)
     }
     
     private func play(level: SnkLevel) {
-        guard state == .gameOver else { return }
+        guard state == .gameOver, let mainVC = parent as? MainVC else { return }
         SharedAudio.stopEverything()
-        let mainVC = self.parent as! MainVC
         mainVC.transition(to: GameVC(level: level), options: .slideLeft)
         SharedAudio.play(sound: kSoundStartGame)
     }

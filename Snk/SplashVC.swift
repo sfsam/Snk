@@ -39,8 +39,10 @@ final class SplashVC: NSViewController {
         view.fadeIn(after: 0.2, duration: 0.5) {
             SharedAudio.loadSounds()
             moDispatch(after: 0.5) {
+                // The parent may be gone if the window was rebuilt
+                // (board size or theme changed) in the meantime.
+                guard let mainVC = self.parent as? MainVC else { return }
                 SharedAudio.play(sound: kSoundStartup)
-                let mainVC = self.parent as! MainVC
                 mainVC.transition(to: MenuVC(), options: [.slideUp, .crossfade])
             }
         }

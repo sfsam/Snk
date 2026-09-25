@@ -46,8 +46,7 @@ class MoView: NSView {
         
         // Draw with optional draw block.
         
-        if let block = drawBlock {
-            let context = NSGraphicsContext.current!.cgContext
+        if let block = drawBlock, let context = NSGraphicsContext.current?.cgContext {
             block(context, bounds)
         }
         

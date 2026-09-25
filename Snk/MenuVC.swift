@@ -54,9 +54,9 @@ final class MenuVC: NSViewController {
     }
     
     @objc func activate(button: SnkHoverButton) {
-        // The min/max dance guarantees rawValue = 1 or 2 or 3 only
-        let level  = SnkLevel(rawValue: min(max(button.tag, 1), 3))!
-        let mainVC = self.parent as! MainVC
+        // The button's tag is its level's raw value.
+        guard let level  = SnkLevel(rawValue: button.tag),
+              let mainVC = parent as? MainVC else { return }
         mainVC.transition(to: GameVC(level: level), options: .slideLeft)
         SharedAudio.play(sound: kSoundStartGame)
     }

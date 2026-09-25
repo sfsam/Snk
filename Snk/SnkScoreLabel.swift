@@ -47,8 +47,8 @@ final class SnkScoreLabel: MoView {
         return CGSize(width: width, height: 14 * kScale)
     }
     
-    let digitsFg: NSImage!
-    let digitsBg: NSImage!
+    let digitsFg: NSImage?
+    let digitsBg: NSImage?
     
     // Create a score label with a digit background.
 
@@ -74,16 +74,16 @@ final class SnkScoreLabel: MoView {
             
             let scoreString = String(self.score)
             for (index, digitCharacter) in scoreString.enumerated() {
-                let digit  = Int( String(digitCharacter) )!
+                guard let digit = digitCharacter.wholeNumberValue else { continue }
                 let toOffset   = 12 * kScale * CGFloat(index)
                 let toWidth    = 14 * kScale
                 let fromOffset =  7 * digit
                 let toRect   = NSRect(x: toOffset, y: 0, width: toWidth, height: toWidth)
                 let fromRect = NSRect(x: fromOffset, y: 0, width: 7, height: 7)
                 if self.drawsDigitsBackground {
-                    self.digitsBg.draw(in: toRect, from: fromRect, operation: .sourceOver, fraction: 1)
+                    self.digitsBg?.draw(in: toRect, from: fromRect, operation: .sourceOver, fraction: 1)
                 }
-                self.digitsFg.draw(in: toRect, from: fromRect, operation: .sourceOver, fraction: 1)
+                self.digitsFg?.draw(in: toRect, from: fromRect, operation: .sourceOver, fraction: 1)
             }
         }
     }
