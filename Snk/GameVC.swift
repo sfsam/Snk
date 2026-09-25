@@ -24,6 +24,15 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
     
     enum SnkDirection {
         case up, down, left, right
+        
+        var opposite: SnkDirection {
+            switch self {
+            case .up:    .down
+            case .down:  .up
+            case .left:  .right
+            case .right: .left
+            }
+        }
     }
     
     let level: SnkLevel
@@ -249,14 +258,11 @@ final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcu
         // once the buffer is full so that mashing keys
         // doesn't queue up moves for many frames.
         
-        let oldDir = directionBuffer.count > 0 ? directionBuffer.last : direction
+        let oldDir = directionBuffer.last ?? direction
         if  state  != .playing ||
             directionBuffer.count >= kMaxBufferedDirections ||
             newDir == oldDir ||
-            newDir == .up    && oldDir == .down ||
-            newDir == .down  && oldDir == .up   ||
-            newDir == .right && oldDir == .left ||
-            newDir == .left  && oldDir == .right {
+            newDir == oldDir.opposite {
             return
         }
         directionBuffer.append(newDir)
