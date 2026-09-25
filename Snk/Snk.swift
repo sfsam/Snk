@@ -50,9 +50,10 @@ let kBaseStep = 12
 // kStep is the step size in points.
 // Both kScale and kStep are var instead of let
 // because they can be reset if the user decides to
-// toggle the size. See AppDelegate toggleBoardSize().
-var kScale: CGFloat = UserDefaults.standard.bool(forKey: kBigBoardKey) ? 2 : 1
-var kStep = kBaseStep * Int(kScale)
+// toggle the size. See AppDelegate toggleSize(_:).
+// They are only used from the main actor.
+@MainActor var kScale: CGFloat = UserDefaults.standard.bool(forKey: kBigBoardKey) ? 2 : 1
+@MainActor var kStep = kBaseStep * Int(kScale)
 
 // MARK: - Game settings
 

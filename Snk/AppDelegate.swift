@@ -43,7 +43,7 @@ final class MainWindow: NSWindow {
 // window controller), clears the high scores, and toggles
 // the board size.
 
-@NSApplicationMain
+@main @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBOutlet var themesMenu: NSMenu?

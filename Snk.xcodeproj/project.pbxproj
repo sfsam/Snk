@@ -498,7 +498,7 @@
 				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mowglii.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Snk;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -518,7 +518,7 @@
 				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mowglii.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Snk;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};

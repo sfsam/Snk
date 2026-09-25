@@ -8,8 +8,9 @@ import Cocoa
 // SharedAudio is a global instance of SnkAudio 
 // to be used throughout the app.
 
-let SharedAudio = SnkAudio()
+@MainActor let SharedAudio = SnkAudio()
 
+@MainActor
 final class SnkAudio: NSObject {
     
     // Map sound filenames to sounds.

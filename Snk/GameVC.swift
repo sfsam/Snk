@@ -12,7 +12,11 @@ struct SnkPoint: Equatable {
     var x = 0, y = 0
 }
 
-final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
+// Core Animation calls the layer and animation delegate
+// methods on the main thread, so @preconcurrency lets GameVC
+// (which is main-actor isolated) conform to these protocols.
+
+final class GameVC: NSViewController, @preconcurrency CALayerDelegate, @preconcurrency CAAnimationDelegate {
     
     enum SnkState {
         case initializing, playing, crashed, victorious, gameOver, paused
@@ -401,28 +405,27 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
 
                 // After the board is back to 2D, wait 0.5 seconds and then
                 // "explode" the snake one segment at a time from head to
-                // tail. The animation just moves each segment along a curve.
-                moDispatch(after: 0.5) {
-                    let boardHeight = CGFloat(kRows * kStep)
-                    for (index, segment) in segments.enumerated() {
-                        moDispatch(after: TimeInterval(index) * 0.1) {
-                            let animPath = CGMutablePath()
-                            animPath.move(to: segment.position)
-                            let midX = self.snakeLayer.frame.midX
-                            let deltaX = 2 * (segment.position.x - midX)
-                            let deltaY = CGFloat(Int.random(in: 0..<15 * kStep))
-                            let endPt  = CGPoint(x: segment.position.x + deltaX, y: segment.position.y - boardHeight)
-                            let ctrlPt = CGPoint(x: segment.position.x + deltaX/2, y: segment.position.y + deltaY)
-                            animPath.addCurve(to: endPt, control1: ctrlPt, control2: ctrlPt)
-                            
-                            let moveAnim = CAKeyframeAnimation(keyPath: "position")
-                            moveAnim.path = animPath
-                            moveAnim.duration = 0.5
-                            moveAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                            moveAnim.delegate = self
-                            moveAnim.setValue(segment, forKey: "segmentLayer")
-                            segment.add(moveAnim, forKey: nil)
-                        }
+                // tail, 0.1 seconds apart. The animation just moves each
+                // segment along a curve.
+                let boardHeight = CGFloat(kRows * kStep)
+                for (index, segment) in segments.enumerated() {
+                    moDispatch(after: 0.5 + TimeInterval(index) * 0.1) {
+                        let animPath = CGMutablePath()
+                        animPath.move(to: segment.position)
+                        let midX = self.snakeLayer.frame.midX
+                        let deltaX = 2 * (segment.position.x - midX)
+                        let deltaY = CGFloat(Int.random(in: 0..<15 * kStep))
+                        let endPt  = CGPoint(x: segment.position.x + deltaX, y: segment.position.y - boardHeight)
+                        let ctrlPt = CGPoint(x: segment.position.x + deltaX/2, y: segment.position.y + deltaY)
+                        animPath.addCurve(to: endPt, control1: ctrlPt, control2: ctrlPt)
+                        
+                        let moveAnim = CAKeyframeAnimation(keyPath: "position")
+                        moveAnim.path = animPath
+                        moveAnim.duration = 0.5
+                        moveAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                        moveAnim.delegate = self
+                        moveAnim.setValue(segment, forKey: "segmentLayer")
+                        segment.add(moveAnim, forKey: nil)
                     }
                 }
             }

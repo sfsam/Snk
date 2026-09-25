@@ -9,9 +9,13 @@ import Cocoa
 // MARK: GCD
 
 // Dispatch `work` on the main queue after `delay` seconds.
+// `work` runs on the main actor since it's on the main queue.
 
-func moDispatch(after delay: TimeInterval, execute work: @escaping () -> Void) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+@MainActor
+func moDispatch(after delay: TimeInterval, execute work: @escaping @MainActor () -> Void) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+        MainActor.assumeIsolated(work)
+    }
 }
 
 // MARK: - NSView Auto Layout
@@ -169,24 +173,29 @@ extension NSView {
 extension NSView {
 
     // Fade receiver in or out. Timing is in seconds.
+    // AppKit calls the completion handler on the main thread.
     
-    func fadeIn(after delay: TimeInterval, duration: TimeInterval, completionHandler: (() -> Void)?) {
+    func fadeIn(after delay: TimeInterval, duration: TimeInterval, completionHandler: (@MainActor () -> Void)?) {
         moDispatch(after: delay) {
             NSAnimationContext.runAnimationGroup({ context in
                 context.duration = duration
                 context.timingFunction = CAMediaTimingFunction(name: .easeOut)
                 self.animator().alphaValue = 1
-            }, completionHandler: completionHandler)
+            }, completionHandler: {
+                MainActor.assumeIsolated { completionHandler?() }
+            })
         }
     }
     
-    func fadeOut(after delay: TimeInterval, duration: TimeInterval, completionHandler: (() -> Void)?) {
+    func fadeOut(after delay: TimeInterval, duration: TimeInterval, completionHandler: (@MainActor () -> Void)?) {
         moDispatch(after: delay) {
             NSAnimationContext.runAnimationGroup({ context in
                 context.duration = duration
                 context.timingFunction = CAMediaTimingFunction(name: .easeIn)
                 self.animator().alphaValue = 0
-            }, completionHandler: completionHandler)
+            }, completionHandler: {
+                MainActor.assumeIsolated { completionHandler?() }
+            })
         }
     }
 }
@@ -196,12 +205,15 @@ extension NSView {
 extension NSViewController {
     
     // Add a `duration` parameter to transitionFromViewController(...).
+    // AppKit calls the completion handler on the main thread.
     
-    func transition(from fromViewController: NSViewController, to toViewController: NSViewController, options: NSViewController.TransitionOptions, duration: TimeInterval, completionHandler completion: (() -> Void)?) {
+    func transition(from fromViewController: NSViewController, to toViewController: NSViewController, options: NSViewController.TransitionOptions, duration: TimeInterval, completionHandler completion: (@MainActor () -> Void)?) {
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = duration
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            self.transition(from: fromViewController, to: toViewController, options: options, completionHandler: completion)
+            self.transition(from: fromViewController, to: toViewController, options: options) {
+                MainActor.assumeIsolated { completion?() }
+            }
         }, completionHandler: nil)
     }
 }

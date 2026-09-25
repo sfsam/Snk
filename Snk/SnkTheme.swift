@@ -20,8 +20,9 @@ struct SnkTheme {
     let colors: [SnkColorName: NSColor]
 }
 
-let SharedTheme = SnkThemeManager()
+@MainActor let SharedTheme = SnkThemeManager()
 
+@MainActor
 final class SnkThemeManager {
 
     let themes: [SnkTheme] = [
