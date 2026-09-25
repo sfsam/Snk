@@ -36,7 +36,11 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     let scoreLabel = SnkScoreLabel(fgColor: SharedTheme.color(.background), bgColor: SharedTheme.color(.wall))
     var scoreIncrement = kMaxScoreIncrement
     
-    let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+    // The game timer calls updateGame() on the main queue
+    // once per frame. It's created by startTimer() because
+    // freeing a timer that was never started crashes.
+    
+    var timer: DispatchSourceTimer?
 
     // The snake is represented by a list of points with
     // the head at the end of the list (snakePoints.last).
@@ -82,6 +86,13 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     init(level: SnkLevel) {
         self.level = level
         super.init(nibName: nil, bundle: nil)
+    }
+    
+    deinit {
+        // Stop the timer if we go away mid-game, which
+        // happens when the user toggles the board size
+        // or changes the theme.
+        timer?.cancel()
     }
     
     // MARK: - View lifecycle
@@ -336,7 +347,7 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
         let reasonForGameOver = state
         state = .gameOver
         SharedAudio.stopMusic()
-        timer.cancel()
+        timer?.cancel()
         
         if reasonForGameOver == .crashed {
             // We crashed! Rattle the board. The animation is 20 random
@@ -660,19 +671,19 @@ final class GameVC: NSViewController, CALayerDelegate, CAAnimationDelegate {
     // MARK: - Timer
     
     func startTimer() {
-        let delta: Int // nanoseconds between timer ticks
+        let secondsPerFrame: TimeInterval
         switch level {
-        case .slow:   delta = Int( kLevel1SecPerFrame * Double(NSEC_PER_SEC) )
-        case .medium: delta = Int( kLevel2SecPerFrame * Double(NSEC_PER_SEC) )
-        case .fast:   delta = Int( kLevel3SecPerFrame * Double(NSEC_PER_SEC) )
+        case .slow:   secondsPerFrame = kLevel1SecPerFrame
+        case .medium: secondsPerFrame = kLevel2SecPerFrame
+        case .fast:   secondsPerFrame = kLevel3SecPerFrame
         }
-        timer.schedule(deadline: .now() + .nanoseconds(delta), repeating: .nanoseconds(delta))
-        timer.setEventHandler { [unowned self] in
-            DispatchQueue.main.async {
-                self.updateGame()
-            }
+        let timer = DispatchSource.makeTimerSource(queue: .main)
+        timer.schedule(deadline: .now() + secondsPerFrame, repeating: secondsPerFrame)
+        timer.setEventHandler { [weak self] in
+            self?.updateGame()
         }
         timer.resume()
+        self.timer = timer
     }
     
     // MARK: - Snake-segment explosion animation did stop
